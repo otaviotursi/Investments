@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Products.Repository.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,14 @@ namespace Products.Service.Kafka
 {
     internal class ProductKafkaConsumerService : BackgroundService
     {
-        private readonly IPrivateProductReadRepository _privateProductReadRepository;
+        private readonly IReadProductRepository _repository;
         private readonly KafkaConfig _kafkaConfig;
         private readonly ILogger<KafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
-        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<KafkaConsumerService> logger, IPrivateProductReadRepository privateProductReadRepository)
+        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<KafkaConsumerService> logger, IReadProductRepository repository)
         {
-            _privateProductReadRepository = privateProductReadRepository;
+            _repository = repository;
             _kafkaConfig = kafkaConfig.Value;
             _logger = logger;
             // Lista de tópicos que o consumidor vai ler
@@ -105,31 +106,17 @@ namespace Products.Service.Kafka
             {
                 case KafkaTopics.InsertProductTopic:
                     _logger.LogInformation($"Processando mensagem de compra de investimento. Key: {key}, Value: {value}");
-                    await _privateProductReadRepository.InsertAsync(JsonConvert.DeserializeObject<ProductDTO>(value), stoppingToken);
-                    break;
-                case KafkaTopics.InvestmentPurchasedTopic:
-                    _logger.LogInformation($"Processando mensagem de compra de investimento. Key: {key}, Value: {value}");
-                    // Adicionar lógica de processamento para o evento de compra de investimento
-                    break;
-
-                case KafkaTopics.InvestmentSoldTopic:
-                    _logger.LogInformation($"Processando mensagem de venda de investimento. Key: {key}, Value: {value}");
-                    // Adicionar lógica de processamento para o evento de venda de investimento
+                    await _repository.InsertAsync(JsonConvert.DeserializeObject<ProductDTO>(value), stoppingToken);
                     break;
 
                 case KafkaTopics.UpdateProductTopic:
                     _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _privateProductReadRepository.UpdateAsync(JsonConvert.DeserializeObject<ProductDTO>(value), stoppingToken);
+                    await _repository.UpdateAsync(JsonConvert.DeserializeObject<ProductDTO>(value), stoppingToken);
                     break;
 
                 case KafkaTopics.DeleteProductTopic:
                     _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _privateProductReadRepository.DeleteAsync(JsonConvert.DeserializeObject<ProductDTO>(value).Id, stoppingToken);
-                    break;
-
-                case KafkaTopics.ProductExpiryNotificationTopic:
-                    _logger.LogInformation($"Processando mensagem de notificação de expiração de produto. Key: {key}, Value: {value}");
-                    // Adicionar lógica de processamento para o evento de notificação de expiração de produto
+                    await _repository.DeleteAsync(JsonConvert.DeserializeObject<ProductDTO>(value).Id, stoppingToken);
                     break;
 
                 default:

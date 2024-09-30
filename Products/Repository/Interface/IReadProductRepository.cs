@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Products.Repository.Interface
 {
-    internal interface ReadProductRepository
+    internal interface IReadProductRepository
     {
     }
 }
