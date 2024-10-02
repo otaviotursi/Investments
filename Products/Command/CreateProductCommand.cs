@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 
 namespace Products.Command
 {
-    public class UpdateProductCommand : MediatR.IRequest<string>
+    public class CreateProductCommand : MediatR.IRequest<string>
     {
-        public UpdateProductCommand()
+        public CreateProductCommand()
         {
         }
 
-        public UpdateProductCommand(Guid id, string name, string productType, ulong unitPrice, ulong availableQuantity)
+        public CreateProductCommand(Guid id, string name, string productType, ulong unitPrice)
         {
             Id = id;
             Name = name;
             ProductType = productType;
             UnitPrice = unitPrice;
-            AvailableQuantity = availableQuantity;
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; }
         public string ProductType { get; set; }
         public ulong UnitPrice { get; set; }

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Repository.Entities
 {
-    public class ProductDTO
+    public class ProductDB
     {
-        public ProductDTO(Guid id, string name, decimal unitPrice, decimal availableQuantity, string productType)
+        public ProductDB(Guid id, string name, decimal unitPrice, decimal availableQuantity, string productType)
         {
             Id = id;
             Name = name;
@@ -17,9 +17,9 @@ namespace Infrastructure.Repository.Entities
             ProductType = productType;
         }
 
-        public ProductDTO() { }
+        public ProductDB() { }
 
-        public ProductDTO(Guid id)
+        public ProductDB(Guid id)
         {
             Id = id;
         }

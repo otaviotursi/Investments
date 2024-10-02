@@ -3,31 +3,32 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Investments", "Investments.csproj", "{BBF89C52-93AC-49AF-AB57-FA2C74ABBBB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Investments", "Investments.csproj", "{BBF89C52-93AC-49AF-AB57-FA2C74ABBBB2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8B99BBC2-0866-4433-8C77-FB8ED46B9ADB} = {8B99BBC2-0866-4433-8C77-FB8ED46B9ADB}
+		{A4572E30-8E56-4EE7-8C7C-1F6B1348F315} = {A4572E30-8E56-4EE7-8C7C-1F6B1348F315}
 		{B973D2A7-812F-4CFC-9DCA-4DBAEED69810} = {B973D2A7-812F-4CFC-9DCA-4DBAEED69810}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Users", "Users\Users.csproj", "{D820DD2B-2894-40AE-B953-31595940E340}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Users", "Users\Users.csproj", "{D820DD2B-2894-40AE-B953-31595940E340}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products", "Products\Products.csproj", "{A4572E30-8E56-4EE7-8C7C-1F6B1348F315}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Products", "Products\Products.csproj", "{A4572E30-8E56-4EE7-8C7C-1F6B1348F315}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B973D2A7-812F-4CFC-9DCA-4DBAEED69810} = {B973D2A7-812F-4CFC-9DCA-4DBAEED69810}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Statement", "Statement\Statement.csproj", "{1BF0FA84-547D-4DE4-8EFF-37847C8123CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Statement", "Statement\Statement.csproj", "{1BF0FA84-547D-4DE4-8EFF-37847C8123CB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Customers", "Customers\Customers.csproj", "{A49ED16B-C7B9-4F11-A06D-6C7EA06FF898}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers", "Customers\Customers.csproj", "{A49ED16B-C7B9-4F11-A06D-6C7EA06FF898}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Portfolio", "Portfolio\Portfolio.csproj", "{38F56F4C-BD1D-4FD7-8C9D-6DADF79529E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portfolio", "Portfolio\Portfolio.csproj", "{38F56F4C-BD1D-4FD7-8C9D-6DADF79529E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "InfraStructure\Infrastructure.csproj", "{8B99BBC2-0866-4433-8C77-FB8ED46B9ADB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "InfraStructure\Infrastructure.csproj", "{8B99BBC2-0866-4433-8C77-FB8ED46B9ADB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B973D2A7-812F-4CFC-9DCA-4DBAEED69810} = {B973D2A7-812F-4CFC-9DCA-4DBAEED69810}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{B973D2A7-812F-4CFC-9DCA-4DBAEED69810}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{B973D2A7-812F-4CFC-9DCA-4DBAEED69810}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

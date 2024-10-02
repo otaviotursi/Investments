@@ -1,4 +1,4 @@
-﻿namespace Investments.Infrastructure.Cache
+﻿namespace Infrastructure.Cache
 {
     public interface IRedisCacheHelper
     {

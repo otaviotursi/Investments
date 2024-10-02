@@ -1,4 +1,4 @@
-﻿namespace Investments.Infrastructure.Services
+﻿namespace Infrastructure.Services
 {
     public interface IKafkaProducerService
     {

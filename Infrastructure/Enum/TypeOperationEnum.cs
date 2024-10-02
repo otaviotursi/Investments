@@ -1,7 +1,7 @@
 ﻿
 using Ardalis.SmartEnum;
 
-namespace Investments.Enum
+namespace Infrastructure.Enum
 {
     public sealed class TypeOperationEnum: SmartEnum<TypeOperationEnum>
     {

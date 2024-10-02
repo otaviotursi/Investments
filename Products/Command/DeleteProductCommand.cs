@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace Products.Command
 {
-    internal class DeleteProductCommand
+    public class DeleteProductCommand : MediatR.IRequest<string>
     {
+        public DeleteProductCommand()
+        {
+        }
+
+        public DeleteProductCommand(Guid id)
+        {
+            Id = id;
+        }
+
+        public Guid Id { get; set; }
     }
 }

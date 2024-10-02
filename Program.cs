@@ -1,4 +1,6 @@
+using Investments;
 using Investments.Infrastructure;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

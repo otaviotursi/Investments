@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace Investments.Infrastructure.Kafka
+namespace Infrastructure.Kafka
 {
         public class KafkaConfig
         {

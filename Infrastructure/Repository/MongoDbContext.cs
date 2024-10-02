@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Infrastructure.Repository.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
@@ -20,8 +21,8 @@ namespace Investments.Infrastructure.Repository
         }
 
         // Definição das coleções (equivalente ao DbSet do Entity Framework)
-        public IMongoCollection<ProductDTO> ProductsRead => _database.GetCollection<ProductDTO>("ProductsRead");
-        public IMongoCollection<ProductDTO> ProductsWrite => _database.GetCollection<ProductDTO>("ProductsWrite");
+        public IMongoCollection<ProductDB> ProductsRead => _database.GetCollection<ProductDB>("ProductsRead");
+        public IMongoCollection<ProductDB> ProductsWrite => _database.GetCollection<ProductDB>("ProductsWrite");
 
     }
 }

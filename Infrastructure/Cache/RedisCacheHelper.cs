@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 
-namespace Investments.Infrastructure.Cache
+namespace Infrastructure.Cache
 {
     internal sealed class RedisCacheHelper(IDistributedCache _distributedCache) : IRedisCacheHelper
     {

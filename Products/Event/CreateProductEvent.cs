@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Products.Event
 {
-    public class UpdateProductEvent : ProductDB, INotification
+    public class CreateProductEvent : ProductDB, INotification
     {
 
-        public UpdateProductEvent(ProductDB product)
+        public CreateProductEvent(ProductDB product)
         {
             Id = product.Id;
             Name = product.Name;

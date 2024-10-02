@@ -1,10 +1,13 @@
 ﻿
 using Confluent.Kafka;
+using Infrastructure.Kafka;
 using Investments.Infrastructure.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
 
-namespace Investments.Infrastructure.Services
+
+namespace Infrastructure.Services
 {
     public class KafkaPublisherService : IKafkaProducerService
     {

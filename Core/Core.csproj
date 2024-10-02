@@ -4,6 +4,8 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -30,14 +32,6 @@
 		<PackageReference Include="StackExchange.Redis" Version="2.8.12" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
 		<PackageReference Include="System.Linq" Version="4.3.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Command\Handler\" />
-	  <Folder Include="Event\Handler\" />
-	  <Folder Include="Query\Handler\" />
-	  <Folder Include="Repository\" />
-	  <Folder Include="Service\Kafka\" />
 	</ItemGroup>
 
 </Project>

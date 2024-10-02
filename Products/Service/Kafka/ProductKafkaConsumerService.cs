@@ -1,6 +1,5 @@
 ﻿using Confluent.Kafka;
 using Infrastructure.Repository.Entities;
-using InvestmentPortfolio.Services;
 using Investments.Infrastructure.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
 
 namespace Products.Service.Kafka
 {
@@ -19,10 +19,10 @@ namespace Products.Service.Kafka
     {
         private readonly IReadProductRepository _repository;
         private readonly KafkaConfig _kafkaConfig;
-        private readonly ILogger<KafkaConsumerService> _logger;
+        private readonly ILogger<ProductKafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
-        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<KafkaConsumerService> logger, IReadProductRepository repository)
+        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger, IReadProductRepository repository)
         {
             _repository = repository;
             _kafkaConfig = kafkaConfig.Value;
@@ -106,17 +106,17 @@ namespace Products.Service.Kafka
             {
                 case KafkaTopics.InsertProductTopic:
                     _logger.LogInformation($"Processando mensagem de compra de investimento. Key: {key}, Value: {value}");
-                    await _repository.InsertAsync(JsonConvert.DeserializeObject<ProductDTO>(value), stoppingToken);
+                    await _repository.InsertAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
                     break;
 
                 case KafkaTopics.UpdateProductTopic:
                     _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _repository.UpdateAsync(JsonConvert.DeserializeObject<ProductDTO>(value), stoppingToken);
+                    await _repository.UpdateAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
                     break;
 
                 case KafkaTopics.DeleteProductTopic:
                     _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _repository.DeleteAsync(JsonConvert.DeserializeObject<ProductDTO>(value).Id, stoppingToken);
+                    await _repository.DeleteAsync(JsonConvert.DeserializeObject<ProductDB>(value).Id, stoppingToken);
                     break;
 
                 default:

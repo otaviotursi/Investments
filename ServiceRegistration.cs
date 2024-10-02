@@ -1,11 +1,17 @@
 ﻿using System.Reflection;
 using FluentValidation;
-using InvestmentPortfolio.Services;
-using Investments.Infrastructure.Cache;
+using Infrastructure.Cache;
+using Infrastructure.Services;
 using Investments.Infrastructure.Kafka;
 using Investments.Infrastructure.Repository;
-using Investments.Infrastructure.Services;
+using MediatR;
 using MongoDB.Driver;
+using Products.Command;
+using Products.Command.Handler;
+using Products.Repository;
+using Products.Repository.Interface;
+using Products.Service.Kafka;
+using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
 
 namespace Investments
 {
@@ -23,7 +29,7 @@ namespace Investments
 
         private static void AddDependencies(IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddTransient<IRequestHandler<InsertProductCommand, string>, InsertProductCommandHandler>();
+            services.AddTransient<IRequestHandler<CreateProductCommand, string>, CreateProductCommandHandler>();
 
             //services.AddTransient<INotificationHandler<CreateProductEvent>, CreateProductEventHandler>();
 
@@ -34,8 +40,10 @@ namespace Investments
         {
 
             services.Configure<KafkaConfig>(configuration.GetSection("Kafka"));
-            services.AddHostedService<KafkaConsumerService>();
+            services.AddHostedService<ProductKafkaConsumerService>();
             services.AddScoped<IKafkaProducerService, KafkaPublisherService>();
+            services.AddScoped<IReadProductRepository, ReadProductRepository>();
+            services.AddScoped<IWriteProductRepository, WriteProductRepository>();
         }
 
         private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
