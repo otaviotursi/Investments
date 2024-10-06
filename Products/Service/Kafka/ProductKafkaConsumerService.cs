@@ -1,6 +1,7 @@
 ﻿using Confluent.Kafka;
 using Infrastructure.Repository.Entities;
 using Investments.Infrastructure.Kafka;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,30 +18,27 @@ namespace Products.Service.Kafka
 {
     internal class ProductKafkaConsumerService : BackgroundService
     {
-        private readonly IReadProductRepository _repository;
-        private readonly KafkaConfig _kafkaConfig;
+        private readonly IServiceProvider _serviceProvider; // Injeção de IServiceProvider
         private readonly ILogger<ProductKafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
-        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger, IReadProductRepository repository)
+
+        public ProductKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger)
         {
-            _repository = repository;
-            _kafkaConfig = kafkaConfig.Value;
+            _serviceProvider = serviceProvider; // Guardar o IServiceProvider
             _logger = logger;
-            // Lista de tópicos que o consumidor vai ler
+
             _topics = new List<string>
-            {
-                KafkaTopics.InsertProductTopic,
-                KafkaTopics.DeleteProductTopic,
-                KafkaTopics.InvestmentPurchasedTopic,
-                KafkaTopics.InvestmentSoldTopic,
-                KafkaTopics.UpdateProductTopic,
-                KafkaTopics.ProductExpiryNotificationTopic
-            };
+        {
+            KafkaTopics.InsertProductTopic,
+            KafkaTopics.DeleteProductTopic,
+            KafkaTopics.UpdateProductTopic
+        };
+
             var config = new ConsumerConfig
             {
-                BootstrapServers = _kafkaConfig.BootstrapServers,
-                GroupId = _kafkaConfig.ConsumerGroupId,
+                BootstrapServers = kafkaConfig.Value.BootstrapServers,
+                GroupId = kafkaConfig.Value.ConsumerGroupId,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnableAutoCommit = true
             };
@@ -50,31 +48,30 @@ namespace Products.Service.Kafka
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
             _consumer.Subscribe(_topics);
             _logger.LogInformation($"Inscrito nos tópicos: {string.Join(", ", _topics)}");
-
 
             try
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    try
+                    var consumeResult = _consumer.Consume(stoppingToken);
+                    if (consumeResult != null)
                     {
-                        var consumeResult = _consumer.Consume(stoppingToken);
-                        if (consumeResult != null)
+                        // Criar um escopo manualmente
+                        using (var scope = _serviceProvider.CreateScope())
                         {
-                            _logger.LogInformation($"Mensagem recebida do tópico {consumeResult.Topic}. Key: {consumeResult.Message.Key}, Value: {consumeResult.Message.Value}");
-                            await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Value, stoppingToken);
-                            _consumer.Commit();
+                            // Resolver o repositório scoped dentro do escopo
+                            var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+
+                            // Chamar o método de processamento da mensagem com o repositório
+                            await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, stoppingToken);
                         }
-                    }
-                    catch (ConsumeException e)
-                    {
-                        _logger.LogError($"Erro ao consumir mensagem: {e.Message}");
+
+                        _consumer.Commit();
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                    //await Task.Delay(2000, stoppingToken); // Aguarde 2 segundos entre as verificações
                 }
             }
             catch (OperationCanceledException)
@@ -87,36 +84,27 @@ namespace Products.Service.Kafka
             }
         }
 
-        public static Acks ParseAcks(string acksValue)
+        private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, CancellationToken stoppingToken)
         {
-            // Converter string para enum Acks
-            return acksValue.ToLower() switch
-            {
-                "all" => Acks.All,
-                "none" => Acks.None,
-                "leader" => Acks.Leader,
-                _ => throw new ArgumentException($"Valor inválido para Acks: {acksValue}")
-            };
-        }
-        private async Task ProcessMessageAsync(string topic, string key, string value, CancellationToken stoppingToken)
-        {
-
-            // Processamento personalizado para cada tópico
+            // Processamento da mensagem usando o repository scoped
             switch (topic)
             {
                 case KafkaTopics.InsertProductTopic:
-                    _logger.LogInformation($"Processando mensagem de compra de investimento. Key: {key}, Value: {value}");
-                    await _repository.InsertAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
+                    _logger.LogInformation($"Processando mensagem de inserção. Key: {key}, Value: {value}");
+                    var productInsert = JsonConvert.DeserializeObject<ProductDB>(value);
+                    await repository.InsertAsync(productInsert, stoppingToken);
                     break;
 
                 case KafkaTopics.UpdateProductTopic:
-                    _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _repository.UpdateAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
+                    _logger.LogInformation($"Processando mensagem de atualização. Key: {key}, Value: {value}");
+                    var productUpdate = JsonConvert.DeserializeObject<ProductDB>(value);
+                    await repository.UpdateAsync(productUpdate, stoppingToken);
                     break;
 
                 case KafkaTopics.DeleteProductTopic:
-                    _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _repository.DeleteAsync(JsonConvert.DeserializeObject<ProductDB>(value).Id, stoppingToken);
+                    _logger.LogInformation($"Processando mensagem de exclusão. Key: {key}, Value: {value}");
+                    var productDelete = JsonConvert.DeserializeObject<ProductDB>(value);
+                    await repository.DeleteAsync(productDelete.Id, stoppingToken);
                     break;
 
                 default:
@@ -125,4 +113,5 @@ namespace Products.Service.Kafka
             }
         }
     }
+
 }

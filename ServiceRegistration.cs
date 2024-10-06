@@ -1,10 +1,13 @@
 ﻿using System.Reflection;
 using FluentValidation;
 using Infrastructure.Cache;
+using Infrastructure.Repository;
 using Infrastructure.Services;
 using Investments.Infrastructure.Kafka;
 using Investments.Infrastructure.Repository;
 using MediatR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Products.Command;
 using Products.Command.Handler;
@@ -19,11 +22,11 @@ namespace Investments
     {
         public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            AddRepositories(services, configuration);
             AddDependencies(services, configuration);
             AddRedisCache(services, configuration);
             AddMongoDB(services, configuration);
             AddMediatR(services, configuration);
-            AddRepositories(services, configuration);
             AddServices(services, configuration);
         }
 
@@ -33,6 +36,7 @@ namespace Investments
 
             //services.AddTransient<INotificationHandler<CreateProductEvent>, CreateProductEventHandler>();
 
+            // Registrar o MongoClient
 
         }
 
@@ -42,22 +46,44 @@ namespace Investments
             services.Configure<KafkaConfig>(configuration.GetSection("Kafka"));
             services.AddHostedService<ProductKafkaConsumerService>();
             services.AddScoped<IKafkaProducerService, KafkaPublisherService>();
-            services.AddScoped<IReadProductRepository, ReadProductRepository>();
-            services.AddScoped<IWriteProductRepository, WriteProductRepository>();
         }
 
         private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
         {
-            // Registrar o MongoClient
-            services.AddSingleton<IMongoClient>(sp =>
-                new MongoClient(configuration.GetConnectionString("DefaultConnection")));
+            // Carregar as configurações do MongoSettings
+            services.Configure<MongoSettings>(configuration.GetSection("ConnectionStrings"));
 
-            //services.AddSingleton<IPrivateProductReadRepository>(sp =>
-            //    new PrivateProductReadRepository(
-            //        sp.GetRequiredService<IMongoClient>(),
-            //        configuration.GetConnectionString("DefaultDatabase"),
-            //        configuration.GetConnectionString("ProductsReadCollectionName")
-            //    ));
+            // Registrar o cliente MongoDB como singleton
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+                return new MongoClient(mongoSettings.ConnectionString);
+            });
+
+            // Alterar os repositórios para serem Scoped
+            services.AddScoped<IReadProductRepository>(sp =>
+            {
+                var mongoClient = sp.GetRequiredService<IMongoClient>();
+                var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+
+                return new ReadProductRepository(
+                    mongoClient,
+                    mongoSettings.DatabaseName,
+                    mongoSettings.ProductsReadCollectionName
+                );
+            });
+
+            services.AddScoped<IWriteProductRepository>(sp =>
+            {
+                var mongoClient = sp.GetRequiredService<IMongoClient>();
+                var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+
+                return new WriteProductRepository(
+                    mongoClient,
+                    mongoSettings.DatabaseName,
+                    mongoSettings.ProductsWriteCollectionName
+                );
+            });
 
 
         }
