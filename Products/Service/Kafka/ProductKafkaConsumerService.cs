@@ -32,7 +32,7 @@ namespace Products.Service.Kafka
         {
             KafkaTopics.InsertProductTopic,
             KafkaTopics.DeleteProductTopic,
-            KafkaTopics.UpdateProductTopic
+                KafkaTopics.UpdateProductTopic,
         };
 
             var config = new ConsumerConfig
