@@ -8,13 +8,14 @@ namespace Infrastructure.Repository.Entities
 {
     public class ProductDB
     {
-        public ProductDB(Guid id, string name, decimal unitPrice, decimal availableQuantity, string productType)
+        public ProductDB(Guid id, string name, decimal unitPrice, decimal availableQuantity, string productType, DateTime expirationDate)
         {
             Id = id;
             Name = name;
             UnitPrice = unitPrice;
             AvailableQuantity = availableQuantity;
             ProductType = productType;
+            ExpirationDate = expirationDate;
         }
 
         public ProductDB() { }

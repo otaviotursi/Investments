@@ -18,6 +18,7 @@ namespace Products.Event
             UnitPrice = product.UnitPrice;
             AvailableQuantity = product.AvailableQuantity;
             ProductType = product.ProductType;
+            ExpirationDate = product.ExpirationDate;
         }
     }
 }

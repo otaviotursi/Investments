@@ -18,30 +18,33 @@ namespace Products.Service.Kafka
 {
     internal class ProductKafkaConsumerService : BackgroundService
     {
-        private readonly IReadProductRepository _privateProductReadRepository;
         private readonly KafkaConfig _kafkaConfig;
         private readonly ILogger<ProductKafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
 
-        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger, IReadProductRepository privateProductReadRepository)
+        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger)
         {
-            _privateProductReadRepository = privateProductReadRepository;
             _kafkaConfig = kafkaConfig.Value;
             _logger = logger;
+
             // Lista de tópicos que o consumidor vai ler
             _topics = new List<string>
             {
                 KafkaTopics.InsertProductTopic,
                 KafkaTopics.DeleteProductTopic,
-                KafkaTopics.UpdateProductTopic
+                KafkaTopics.InvestmentPurchasedTopic,
+                KafkaTopics.InvestmentSoldTopic,
+                KafkaTopics.UpdateProductTopic,
+                KafkaTopics.ProductExpiryNotificationTopic
             };
+
             var config = new ConsumerConfig
             {
                 BootstrapServers = _kafkaConfig.BootstrapServers,
-                GroupId = _kafkaConfig.ConsumerGroupId, // Adicionar um GroupId para o consumidor
-                AutoOffsetReset = AutoOffsetReset.Earliest, // Garantir que comece do início se não houver offsets salvos
-                EnableAutoCommit = true // Commit manual após processamento
+                GroupId = _kafkaConfig.ConsumerGroupId,
+                AutoOffsetReset = AutoOffsetReset.Earliest,
+                EnableAutoCommit = true
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
@@ -49,10 +52,8 @@ namespace Products.Service.Kafka
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
             _consumer.Subscribe(_topics);
             _logger.LogInformation($"Inscrito nos tópicos: {string.Join(", ", _topics)}");
-
 
             try
             {
@@ -65,15 +66,20 @@ namespace Products.Service.Kafka
                         {
                             _logger.LogInformation($"Mensagem recebida do tópico {consumeResult.Topic}. Key: {consumeResult.Message.Key}, Value: {consumeResult.Message.Value}");
                             await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Value, stoppingToken);
-                            _consumer.Commit();
+                            _consumer.Commit(consumeResult);
                         }
                     }
                     catch (ConsumeException e)
                     {
-                        _logger.LogError($"Erro ao consumir mensagem: {e.Message}");
+                        _logger.LogError($"Erro ao consumir mensagem: {e.Error.Reason}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Erro inesperado: {ex.Message}");
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(50), stoppingToken);
+                    // O tempo de espera pode ser ajustado conforme a necessidade
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
                 }
             }
             catch (OperationCanceledException)
@@ -86,50 +92,24 @@ namespace Products.Service.Kafka
             }
         }
 
-        public static Acks ParseAcks(string acksValue)
-        {
-            // Converter string para enum Acks
-            return acksValue.ToLower() switch
-            {
-                "all" => Acks.All,
-                "none" => Acks.None,
-                "leader" => Acks.Leader,
-                _ => throw new ArgumentException($"Valor inválido para Acks: {acksValue}")
-            };
-        }
         private async Task ProcessMessageAsync(string topic, string key, string value, CancellationToken stoppingToken)
         {
-
             // Processamento personalizado para cada tópico
             switch (topic)
             {
                 case KafkaTopics.InsertProductTopic:
-                    _logger.LogInformation($"Processando mensagem de compra de investimento. Key: {key}, Value: {value}");
-                    await _privateProductReadRepository.InsertAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
-                    break;
-                case KafkaTopics.InvestmentPurchasedTopic:
-                    _logger.LogInformation($"Processando mensagem de compra de investimento. Key: {key}, Value: {value}");
-                    // Adicionar lógica de processamento para o evento de compra de investimento
-                    break;
-
-                case KafkaTopics.InvestmentSoldTopic:
-                    _logger.LogInformation($"Processando mensagem de venda de investimento. Key: {key}, Value: {value}");
-                    // Adicionar lógica de processamento para o evento de venda de investimento
+                    _logger.LogInformation($"Processando mensagem de inserção de produto. Key: {key}, Value: {value}");
+                    // await _repository.InsertAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
                     break;
 
                 case KafkaTopics.UpdateProductTopic:
                     _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _privateProductReadRepository.UpdateAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
+                    // await _repository.UpdateAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
                     break;
 
                 case KafkaTopics.DeleteProductTopic:
-                    _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    await _privateProductReadRepository.DeleteAsync(JsonConvert.DeserializeObject<ProductDB>(value).Id, stoppingToken);
-                    break;
-
-                case KafkaTopics.ProductExpiryNotificationTopic:
-                    _logger.LogInformation($"Processando mensagem de notificação de expiração de produto. Key: {key}, Value: {value}");
-                    // Adicionar lógica de processamento para o evento de notificação de expiração de produto
+                    _logger.LogInformation($"Processando mensagem de exclusão de produto. Key: {key}, Value: {value}");
+                    // await _repository.DeleteAsync(JsonConvert.DeserializeObject<ProductDB>(value).Id, stoppingToken);
                     break;
 
                 default:
@@ -138,5 +118,4 @@ namespace Products.Service.Kafka
             }
         }
     }
-
 }

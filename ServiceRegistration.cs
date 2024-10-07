@@ -65,7 +65,7 @@ namespace Investments
                 ));
 
             // Registrar o ProductWriteRepository com os valores diretamente
-            services.AddSingleton<IWriteProductRepository>(sp =>
+            services.AddScoped<IWriteProductRepository>(sp =>
                 new WriteProductRepository(
                     sp.GetRequiredService<IMongoClient>(),
                     configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados

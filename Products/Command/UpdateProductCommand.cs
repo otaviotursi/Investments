@@ -12,13 +12,14 @@ namespace Products.Command
         {
         }
 
-        public UpdateProductCommand(Guid id, string name, string productType, ulong unitPrice, ulong availableQuantity)
+        public UpdateProductCommand(Guid id, string name, string productType, ulong unitPrice, ulong availableQuantity, DateTime expirationDate)
         {
             Id = id;
             Name = name;
             ProductType = productType;
             UnitPrice = unitPrice;
             AvailableQuantity = availableQuantity;
+            ExpirationDate = expirationDate;
         }
 
         public Guid Id { get; set; }
@@ -26,5 +27,7 @@ namespace Products.Command
         public string ProductType { get; set; }
         public ulong UnitPrice { get; set; }
         public ulong AvailableQuantity { get; set; }
+        public DateTime ExpirationDate { get; set; }
+
     }
 }

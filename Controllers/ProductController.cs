@@ -42,10 +42,17 @@ namespace Investments.Controllers
 
             return Ok(response);
         }
-        [HttpGet("statement/{name}")]
-        public async Task<IActionResult> GetByName([FromRoute] string productName,CancellationToken cancellationToken = default)
+        [HttpGet("{productName}")]
+        public async Task<IActionResult> GetByName([FromRoute] string productName, CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetAllProductCommand(), cancellationToken);
+            var response = await _mediator.Send(new GetProductByNameCommand(), cancellationToken);
+
+            return Ok(response);
+        }
+        [HttpGet("statement/{productName}")]
+        public async Task<IActionResult> GetStatementByName([FromRoute] string productName,CancellationToken cancellationToken = default)
+        {
+            var response = await _mediator.Send(new GetStatementByNameProductCommand(), cancellationToken);
 
             return Ok(response);
         }
