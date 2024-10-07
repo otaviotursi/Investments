@@ -19,25 +19,23 @@ namespace Products.Service.Kafka
     internal class ProductKafkaConsumerService : BackgroundService
     {
         private readonly KafkaConfig _kafkaConfig;
+        private readonly IServiceProvider _serviceProvider; // Injeção de IServiceProvider
         private readonly ILogger<ProductKafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
 
-        public ProductKafkaConsumerService(IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger)
+        public ProductKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger)
         {
             _kafkaConfig = kafkaConfig.Value;
+            _serviceProvider = serviceProvider; // Guardar o IServiceProvider
             _logger = logger;
 
-            // Lista de tópicos que o consumidor vai ler
             _topics = new List<string>
-            {
-                KafkaTopics.InsertProductTopic,
-                KafkaTopics.DeleteProductTopic,
-                KafkaTopics.InvestmentPurchasedTopic,
-                KafkaTopics.InvestmentSoldTopic,
-                KafkaTopics.UpdateProductTopic,
-                KafkaTopics.ProductExpiryNotificationTopic
-            };
+        {
+            KafkaTopics.InsertProductTopic
+            //KafkaTopics.DeleteProductTopic
+            //KafkaTopics.UpdateProductTopic
+        };
 
             var config = new ConsumerConfig
             {
@@ -59,27 +57,23 @@ namespace Products.Service.Kafka
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    try
+                    var consumeResult = _consumer.Consume(stoppingToken);
+                    if (consumeResult != null)
                     {
-                        var consumeResult = _consumer.Consume(stoppingToken);
-                        if (consumeResult != null)
+                        // Criar um escopo manualmente
+                        using (var scope = _serviceProvider.CreateScope())
                         {
-                            _logger.LogInformation($"Mensagem recebida do tópico {consumeResult.Topic}. Key: {consumeResult.Message.Key}, Value: {consumeResult.Message.Value}");
-                            await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Value, stoppingToken);
-                            _consumer.Commit(consumeResult);
+                            // Resolver o repositório scoped dentro do escopo
+                            var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+
+                            // Chamar o método de processamento da mensagem com o repositório
+                            await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, stoppingToken);
                         }
-                    }
-                    catch (ConsumeException e)
-                    {
-                        _logger.LogError($"Erro ao consumir mensagem: {e.Error.Reason}");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"Erro inesperado: {ex.Message}");
+
+                        _consumer.Commit();
                     }
 
-                    // O tempo de espera pode ser ajustado conforme a necessidade
-                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                 }
             }
             catch (OperationCanceledException)
@@ -92,24 +86,27 @@ namespace Products.Service.Kafka
             }
         }
 
-        private async Task ProcessMessageAsync(string topic, string key, string value, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, CancellationToken stoppingToken)
         {
-            // Processamento personalizado para cada tópico
+            // Processamento da mensagem usando o repository scoped
             switch (topic)
             {
                 case KafkaTopics.InsertProductTopic:
-                    _logger.LogInformation($"Processando mensagem de inserção de produto. Key: {key}, Value: {value}");
-                    // await _repository.InsertAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
+                    _logger.LogInformation($"Processando mensagem de inserção. Key: {key}, Value: {value}");
+                    var productInsert = JsonConvert.DeserializeObject<ProductDB>(value);
+                    await repository.InsertAsync(productInsert, stoppingToken);
                     break;
 
                 case KafkaTopics.UpdateProductTopic:
-                    _logger.LogInformation($"Processando mensagem de atualização de produto. Key: {key}, Value: {value}");
-                    // await _repository.UpdateAsync(JsonConvert.DeserializeObject<ProductDB>(value), stoppingToken);
+                    _logger.LogInformation($"Processando mensagem de atualização. Key: {key}, Value: {value}");
+                    var productUpdate = JsonConvert.DeserializeObject<ProductDB>(value);
+                    await repository.UpdateAsync(productUpdate, stoppingToken);
                     break;
 
                 case KafkaTopics.DeleteProductTopic:
-                    _logger.LogInformation($"Processando mensagem de exclusão de produto. Key: {key}, Value: {value}");
-                    // await _repository.DeleteAsync(JsonConvert.DeserializeObject<ProductDB>(value).Id, stoppingToken);
+                    _logger.LogInformation($"Processando mensagem de exclusão. Key: {key}, Value: {value}");
+                    var productDelete = JsonConvert.DeserializeObject<ProductDB>(value);
+                    await repository.DeleteAsync(productDelete.Id, stoppingToken);
                     break;
 
                 default:
@@ -118,4 +115,5 @@ namespace Products.Service.Kafka
             }
         }
     }
+
 }
