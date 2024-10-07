@@ -38,7 +38,14 @@ namespace Investments.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
         {
-            var response = await _productReadRepository.GetAll(cancellationToken);
+            var response = await _mediator.Send(new GetAllProductCommand(), cancellationToken);
+
+            return Ok(response);
+        }
+        [HttpGet("statement/{name}")]
+        public async Task<IActionResult> GetByName([FromRoute] string productName,CancellationToken cancellationToken = default)
+        {
+            var response = await _mediator.Send(new GetAllProductCommand(), cancellationToken);
 
             return Ok(response);
         }

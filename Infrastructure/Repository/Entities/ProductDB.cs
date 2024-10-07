@@ -27,6 +27,7 @@ namespace Infrastructure.Repository.Entities
         public Guid Id { get; set; }
         public string Name { get; set; }
         public decimal UnitPrice { get; set; }
+        public DateTime ExpirationDate { get; set; }
         public string ProductType { get; set; }
         public decimal AvailableQuantity { get; set; }
     }

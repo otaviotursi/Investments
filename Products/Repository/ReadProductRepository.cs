@@ -50,5 +50,14 @@ namespace Products.Repository
 
             await _eventCollection.UpdateOneAsync(filter, update, null, cancellationToken);
         }
+
+        public Task<ProductDB> GetByName(string name, CancellationToken cancellationToken)
+        {
+            var filter = Builders<ProductDB>.Filter.Eq(x => x.Name, name);
+
+            var result = _eventCollection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+            return result;
+        }
     }
 }

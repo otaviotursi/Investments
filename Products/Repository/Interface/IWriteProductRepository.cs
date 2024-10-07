@@ -12,5 +12,6 @@ namespace Products.Repository.Interface
         Task InsertAsync(ProductDB ProductDB, CancellationToken cancellationToken);
         Task UpdateAsync(ProductDB ProductDB, CancellationToken cancellationToken);
         Task DeleteAsync(Guid id, CancellationToken cancellationToken);
+        Task<List<ProductDB>> GetStatementByName(string name, CancellationToken cancellationToken);
     }
 }

@@ -22,17 +22,17 @@ namespace Investments
     {
         public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            AddRepositories(services, configuration);
             AddDependencies(services, configuration);
             AddRedisCache(services, configuration);
             AddMongoDB(services, configuration);
             AddMediatR(services, configuration);
+            AddRepositories(services, configuration);
             AddServices(services, configuration);
         }
 
         private static void AddDependencies(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddTransient<IRequestHandler<CreateProductCommand, string>, CreateProductCommandHandler>();
+            //services.AddTransient<IRequestHandler<InsertProductCommand, string>, InsertProductCommandHandler>();
 
             //services.AddTransient<INotificationHandler<CreateProductEvent>, CreateProductEventHandler>();
 
@@ -50,42 +50,27 @@ namespace Investments
 
         private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
         {
-            // Carregar as configurações do MongoSettings
-            services.Configure<MongoSettings>(configuration.GetSection("ConnectionStrings"));
-
-            // Registrar o cliente MongoDB como singleton
+            // Registrar o MongoClient
             services.AddSingleton<IMongoClient>(sp =>
-            {
-                var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
-                return new MongoClient(mongoSettings.ConnectionString);
-            });
-
-            // Alterar os repositórios para serem Scoped
-            services.AddScoped<IReadProductRepository>(sp =>
-            {
-                var mongoClient = sp.GetRequiredService<IMongoClient>();
-                var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
-
-                return new ReadProductRepository(
-                    mongoClient,
-                    mongoSettings.DatabaseName,
-                    mongoSettings.ProductsReadCollectionName
-                );
-            });
-
-            services.AddScoped<IWriteProductRepository>(sp =>
-            {
-                var mongoClient = sp.GetRequiredService<IMongoClient>();
-                var mongoSettings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
-
-                return new WriteProductRepository(
-                    mongoClient,
-                    mongoSettings.DatabaseName,
-                    mongoSettings.ProductsWriteCollectionName
-                );
-            });
+                new MongoClient(configuration.GetConnectionString("DefaultConnection")));
 
 
+
+            // Registrar o ProductReadRepository com os valores diretamente
+            services.AddSingleton<IReadProductRepository>(sp =>
+                new ReadProductRepository(
+                    sp.GetRequiredService<IMongoClient>(),
+                    configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
+                    configuration.GetConnectionString("ProductsReadCollectionName")  // Nome correto da coleção
+                ));
+
+            // Registrar o ProductWriteRepository com os valores diretamente
+            services.AddSingleton<IWriteProductRepository>(sp =>
+                new WriteProductRepository(
+                    sp.GetRequiredService<IMongoClient>(),
+                    configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
+                    configuration.GetConnectionString("ProductsWriteCollectionName")  // Nome correto da coleção
+                ));
         }
 
         private static void AddMediatR(IServiceCollection services, IConfiguration configuration)
