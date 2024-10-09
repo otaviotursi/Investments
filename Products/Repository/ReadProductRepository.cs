@@ -35,7 +35,15 @@ namespace Products.Repository
 
         public async Task InsertAsync(ProductDB productDB, CancellationToken cancellationToken)
         {
-            await _eventCollection.InsertOneAsync(productDB);
+            var productById = await GetById(productDB.Id, cancellationToken);
+            if (productById == null) { 
+                await _eventCollection.InsertOneAsync(productDB);
+            } else
+            {
+                await UpdateAsync(productDB, cancellationToken);
+            }
+
+            
         }
 
         public async Task UpdateAsync(ProductDB productDB, CancellationToken cancellationToken)
@@ -51,9 +59,17 @@ namespace Products.Repository
             await _eventCollection.UpdateOneAsync(filter, update, null, cancellationToken);
         }
 
-        public Task<ProductDB> GetByName(string name, CancellationToken cancellationToken)
+        public async Task<ProductDB> GetByName(string name, CancellationToken cancellationToken)
         {
             var filter = Builders<ProductDB>.Filter.Eq(x => x.Name, name);
+
+            var result = await _eventCollection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+            return result;
+        }
+        public Task<ProductDB?> GetById(Guid id, CancellationToken cancellationToken)
+        {
+            var filter = Builders<ProductDB>.Filter.Eq(x => x.Id, id);
 
             var result = _eventCollection.Find(filter).FirstOrDefaultAsync(cancellationToken);
 

@@ -45,14 +45,14 @@ namespace Investments.Controllers
         [HttpGet("{productName}")]
         public async Task<IActionResult> GetByName([FromRoute] string productName, CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetProductByNameCommand(), cancellationToken);
+            var response = await _mediator.Send(new GetProductByNameCommand(productName), cancellationToken);
 
             return Ok(response);
         }
         [HttpGet("statement/{productName}")]
         public async Task<IActionResult> GetStatementByName([FromRoute] string productName,CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetStatementByNameProductCommand(), cancellationToken);
+            var response = await _mediator.Send(new GetStatementByNameProductCommand(productName), cancellationToken);
 
             return Ok(response);
         }

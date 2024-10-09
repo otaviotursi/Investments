@@ -42,8 +42,7 @@ namespace Products.Repository
 
         public async Task<List<ProductDB>> GetStatementByName(string name, CancellationToken cancellationToken)
         {
-            var filter = Builders<BsonDocument>.Filter.ElemMatch<BsonDocument>("Data",
-        Builders<BsonDocument>.Filter.Eq("Name", name));
+            var filter = Builders<BsonDocument>.Filter.Eq("Data.Name", name);
 
             var results = await _eventCollection.Find(filter).ToListAsync();
 
@@ -51,17 +50,17 @@ namespace Products.Repository
             List<ProductDB> products = new List<ProductDB>();
             foreach (var document in results)
             {
-                // Supondo que o campo 'Data' seja um array de objetos e você esteja interessado em todos eles
-                var dataArray = document["Data"].AsBsonArray;
-                foreach (var dataItem in dataArray)
+                var product = new ProductDB
                 {
-                    var product = new ProductDB
-                    {
-                        Id = dataItem["id"].AsGuid, // ajuste conforme os nomes reais dos campos
-                        Name = dataItem["name"].AsString,
-                    };
-                    products.Add(product);
-                }
+                    Id = Guid.Parse(document["Data"]["_id"].AsGuid.ToString()),
+                    Name = document["Data"]["Name"].AsString,
+                    UnitPrice = Convert.ToDecimal(document["Data"]["UnitPrice"].AsString),
+                    ExpirationDate = document["Data"]["ExpirationDate"].ToUniversalTime(),
+                    ProductType = document["Data"]["ProductType"].AsString,
+                    AvailableQuantity = Convert.ToInt32(document["Data"]["AvailableQuantity"].AsString)
+                };
+
+                products.Add(product);
             }
 
             return products;
