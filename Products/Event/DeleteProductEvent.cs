@@ -14,5 +14,9 @@ namespace Products.Event
         {
             Id = id;
         }
+        public DeleteProductEvent()
+        {
+        }
+
     }
 }

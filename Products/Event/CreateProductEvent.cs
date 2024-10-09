@@ -11,6 +11,10 @@ namespace Products.Event
     public class CreateProductEvent : ProductDB, INotification
     {
 
+        public CreateProductEvent()
+        {
+
+        }
         public CreateProductEvent(ProductDB product)
         {
             Id = product.Id;

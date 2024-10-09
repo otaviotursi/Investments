@@ -1,4 +1,5 @@
-﻿using Infrastructure.Repository.Entities;
+﻿using AutoMapper;
+using Infrastructure.Repository.Entities;
 using MediatR;
 using Products.Event;
 using Products.Repository.Interface;
@@ -14,20 +15,24 @@ namespace Products.Command.Handler
     {
         private readonly IMediator _mediator;
         private readonly IWriteProductRepository _repositoryWrite;
+        private readonly IMapper _mapper;
 
-        public UpdateProductCommandHandler(IMediator mediator, IWriteProductRepository repositoryWrite)
+        public UpdateProductCommandHandler(IMediator mediator, IWriteProductRepository repositoryWrite, IMapper mapper)
         {
             _mediator = mediator;
             _repositoryWrite = repositoryWrite;
+            _mapper = mapper;
         }
 
         public async Task<string> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
         {
             try
             {
-                var product = new ProductDB(command.Id, command.Name, command.UnitPrice, command.AvailableQuantity, command.ProductType, command.ExpirationDate, command.User); //todo: alterar para automapper
+                var product = _mapper.Map<ProductDB>(command);
                 await _repositoryWrite.UpdateAsync(product, cancellationToken);
-                await _mediator.Publish(new UpdateProductEvent(product));
+
+                var productEvent = _mapper.Map<UpdateProductEvent>(command);
+                await _mediator.Publish(productEvent);
 
                 return await Task.FromResult("Produto alterado com sucesso");
             }

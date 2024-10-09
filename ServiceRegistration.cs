@@ -6,6 +6,7 @@ using Infrastructure.Services;
 using Investments.Infrastructure.Kafka;
 using Investments.Infrastructure.Repository;
 using MediatR;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -32,6 +33,7 @@ namespace Investments
 
         private static void AddDependencies(IServiceCollection services, IConfiguration configuration)
         {
+
             //services.AddTransient<IRequestHandler<InsertProductCommand, string>, InsertProductCommandHandler>();
 
             //services.AddTransient<INotificationHandler<CreateProductEvent>, CreateProductEventHandler>();
