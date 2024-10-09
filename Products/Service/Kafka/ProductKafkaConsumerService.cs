@@ -29,7 +29,7 @@ namespace Products.Service.Kafka
             _kafkaConfig = kafkaConfig.Value;
             _serviceProvider = serviceProvider; // Guardar o IServiceProvider
             _logger = logger;
-
+            // Lista de tópicos que o consumidor vai ler
             _topics = new List<string>
             {
                 KafkaTopics.InsertProductTopic,
@@ -39,22 +39,22 @@ namespace Products.Service.Kafka
                 KafkaTopics.UpdateProductTopic,
                 KafkaTopics.ProductExpiryNotificationTopic
             };
-
             var config = new ConsumerConfig
             {
                 BootstrapServers = _kafkaConfig.BootstrapServers,
-                GroupId = _kafkaConfig.ConsumerGroupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = false
+                GroupId = _kafkaConfig.ConsumerGroupId, // Adicionar um GroupId para o consumidor
+                AutoOffsetReset = AutoOffsetReset.Earliest, // Garantir que comece do início se não houver offsets salvos
+                EnableAutoCommit = false // Commit manual após processamento
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
         }
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+
             _consumer.Subscribe(_topics);
             _logger.LogInformation($"Inscrito nos tópicos: {string.Join(", ", _topics)}");
+
 
             try
             {
@@ -75,14 +75,13 @@ namespace Products.Service.Kafka
 
                             _consumer.Commit();
                         }
-
-                        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
                     }
-                    catch (ConsumeException ex)
+                    catch (ConsumeException e)
                     {
-                        _logger.LogError($"Erro ao consumir mensagem: {ex.Error.Reason}");
-                        // Continue mesmo com erro
+                        _logger.LogError($"Erro ao consumir mensagem: {e.Message}");
                     }
+
+                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
                 }
             }
             catch (OperationCanceledException)
@@ -94,6 +93,8 @@ namespace Products.Service.Kafka
                 _consumer.Close();
             }
         }
+
+
 
         private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, CancellationToken stoppingToken)
         {
