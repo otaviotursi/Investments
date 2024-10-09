@@ -31,18 +31,21 @@ namespace Products.Service.Kafka
             _logger = logger;
 
             _topics = new List<string>
-        {
-            KafkaTopics.InsertProductTopic
-            //KafkaTopics.DeleteProductTopic
-            //KafkaTopics.UpdateProductTopic
-        };
+            {
+                KafkaTopics.InsertProductTopic,
+                KafkaTopics.DeleteProductTopic,
+                KafkaTopics.InvestmentPurchasedTopic,
+                KafkaTopics.InvestmentSoldTopic,
+                KafkaTopics.UpdateProductTopic,
+                KafkaTopics.ProductExpiryNotificationTopic
+            };
 
             var config = new ConsumerConfig
             {
                 BootstrapServers = _kafkaConfig.BootstrapServers,
                 GroupId = _kafkaConfig.ConsumerGroupId,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = true
+                EnableAutoCommit = false
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
@@ -57,23 +60,29 @@ namespace Products.Service.Kafka
             {
                 while (!stoppingToken.IsCancellationRequested)
                 {
-                    var consumeResult = _consumer.Consume(stoppingToken);
-                    if (consumeResult != null)
+                    try
                     {
-                        // Criar um escopo manualmente
-                        using (var scope = _serviceProvider.CreateScope())
+                        var consumeResult = _consumer.Consume(stoppingToken);
+                        if (consumeResult != null)
                         {
-                            // Resolver o repositório scoped dentro do escopo
-                            var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+                            _logger.LogInformation($"Mensagem recebida do tópico {consumeResult.Topic}: {consumeResult.Message.Value}");
 
-                            // Chamar o método de processamento da mensagem com o repositório
-                            await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, stoppingToken);
+                            using (var scope = _serviceProvider.CreateScope())
+                            {
+                                var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+                                await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, stoppingToken);
+                            }
+
+                            _consumer.Commit();
                         }
 
-                        _consumer.Commit();
+                        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
                     }
-
-                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                    catch (ConsumeException ex)
+                    {
+                        _logger.LogError($"Erro ao consumir mensagem: {ex.Error.Reason}");
+                        // Continue mesmo com erro
+                    }
                 }
             }
             catch (OperationCanceledException)
