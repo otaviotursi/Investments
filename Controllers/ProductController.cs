@@ -36,23 +36,24 @@ namespace Investments.Controllers
             return Ok(response);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAll([FromQuery] string? productName, CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetAllProductCommand(), cancellationToken);
+            if(productName == null)
+            {
+                var response = await _mediator.Send(new GetAllProductCommand(), cancellationToken);
+                return Ok(response);
 
-            return Ok(response);
-        }
-        [HttpGet("{productName}")]
-        public async Task<IActionResult> GetByName([FromRoute] string productName, CancellationToken cancellationToken = default)
-        {
-            var response = await _mediator.Send(new GetProductByNameCommand(productName), cancellationToken);
+            } else
+            {
+                var response = await _mediator.Send(new GetProductByNameCommand(productName), cancellationToken);
+                return Ok(response);
+            }
 
-            return Ok(response);
         }
-        [HttpGet("statement/{productName}")]
-        public async Task<IActionResult> GetStatementByName([FromRoute] string productName,CancellationToken cancellationToken = default)
+        [HttpGet("statement")]
+        public async Task<IActionResult> GetStatementByName([FromQuery] string? user, [FromQuery] string? productName, [FromQuery] DateTime? expirationDate, CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetStatementByNameProductCommand(productName), cancellationToken);
+            var response = await _mediator.Send(new GetStatementByProductCommand(user, productName, expirationDate), cancellationToken);
 
             return Ok(response);
         }

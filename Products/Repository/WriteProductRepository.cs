@@ -40,15 +40,35 @@ namespace Products.Repository
             await _eventCollection.InsertOneAsync(eventDocument);
         }
 
-        public async Task<List<ProductDB>> GetStatementByName(string name, CancellationToken cancellationToken)
+        public async Task<List<ProductDB>> GetStatementBy(string? name, string? user, DateTime? expirationDate,CancellationToken cancellationToken)
         {
-            var filter = Builders<BsonDocument>.Filter.Eq("Data.Name", name);
+            var filters = new List<FilterDefinition<BsonDocument>>();
 
-            var results = await _eventCollection.Find(filter).ToListAsync();
+            // Verifica se 'name' não é null e adiciona o filtro correspondente
+            if (!string.IsNullOrEmpty(name))
+            {
+                filters.Add(Builders<BsonDocument>.Filter.Eq("Data.Name", name));
+            }
 
+            // Verifica se 'user' não é null e adiciona o filtro correspondente
+            if (!string.IsNullOrEmpty(user))
+            {
+                filters.Add(Builders<BsonDocument>.Filter.Eq("Data.User", user)); // Supondo que o campo seja 'Data.User'
+            }
+
+            // Verifica se 'expirationDate' não é null e adiciona o filtro correspondente
+            if (expirationDate != null)
+            {
+                filters.Add(Builders<BsonDocument>.Filter.Eq("Data.ExpirationDate", expirationDate));
+            }
+
+            // Combina os filtros usando o operador AND se houver mais de um
+            var filter = filters.Count > 0 ? Builders<BsonDocument>.Filter.And(filters) : FilterDefinition<BsonDocument>.Empty;
+
+            var documents = _eventCollection.Find(filter).ToList();
             // Convertendo os resultados para ProductDb
             List<ProductDB> products = new List<ProductDB>();
-            foreach (var document in results)
+            foreach (var document in documents)
             {
                 var product = new ProductDB
                 {

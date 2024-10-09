@@ -8,7 +8,7 @@ namespace Infrastructure.Repository.Entities
 {
     public class ProductDB
     {
-        public ProductDB(Guid id, string name, decimal unitPrice, decimal availableQuantity, string productType, DateTime expirationDate)
+        public ProductDB(Guid id, string name, decimal unitPrice, decimal availableQuantity, string productType, DateTime expirationDate, string user)
         {
             Id = id;
             Name = name;
@@ -16,6 +16,7 @@ namespace Infrastructure.Repository.Entities
             AvailableQuantity = availableQuantity;
             ProductType = productType;
             ExpirationDate = expirationDate;
+            User = user;
         }
 
         public ProductDB() { }
@@ -31,5 +32,6 @@ namespace Infrastructure.Repository.Entities
         public DateTime ExpirationDate { get; set; }
         public string ProductType { get; set; }
         public decimal AvailableQuantity { get; set; }
+        public string User { get; set; }
     }
 }

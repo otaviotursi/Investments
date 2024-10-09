@@ -25,7 +25,7 @@ namespace Products.Command.Handler
         {
             try
             {
-                var product = new ProductDB(command.Id, command.Name, command.UnitPrice, command.AvailableQuantity, command.ProductType, command.ExpirationDate);
+                var product = new ProductDB(command.Id, command.Name, command.UnitPrice, command.AvailableQuantity, command.ProductType, command.ExpirationDate, command.User);//TODO: alterar para automapper
                 await _repositoryWrite.InsertAsync(product, cancellationToken);
 
                 await _mediator.Publish(new CreateProductEvent(product));

@@ -7,17 +7,21 @@ using System.Threading.Tasks;
 
 namespace Products.Command
 {
-    public class GetStatementByNameProductCommand : MediatR.IRequest<List<ProductDB>>
+    public class GetStatementByProductCommand : MediatR.IRequest<List<ProductDB>>
     {
-        public GetStatementByNameProductCommand()
+        public GetStatementByProductCommand()
         {
         }
-        public GetStatementByNameProductCommand(string name)
+        public GetStatementByProductCommand(string? name, string? user, DateTime? expirationDate)
         {
             Name = name;
+            User = user;
+            ExpirationDate = expirationDate;
         }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
+        public string? User { get; set; }
+        public DateTime? ExpirationDate { get; set; }
 
     }
 }

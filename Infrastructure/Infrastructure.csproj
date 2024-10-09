@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	  <Folder Include="QuartzJobs\" />
 	  <Folder Include="Services\" />
 	  <Folder Include="Kafka\" />
 	  <Folder Include="Enum\" />
