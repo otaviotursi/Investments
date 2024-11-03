@@ -1,4 +1,6 @@
 ﻿using System.Reflection;
+using Customers.Repository;
+using Customers.Repository.Interface;
 using FluentValidation;
 using Infrastructure.Cache;
 using Infrastructure.Repository;
@@ -72,6 +74,15 @@ namespace Investments
                     sp.GetRequiredService<IMongoClient>(),
                     configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
                     configuration.GetConnectionString("ProductsWriteCollectionName")  // Nome correto da coleção
+                ));
+
+
+            // Registrar o CustomerRepository com os valores diretamente
+            services.AddScoped<ICustomerRepository>(sp =>
+                new CustomerRepository(
+                    sp.GetRequiredService<IMongoClient>(),
+                    configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
+                    configuration.GetConnectionString("CustomerCollectionName")  // Nome correto da coleção
                 ));
         }
 

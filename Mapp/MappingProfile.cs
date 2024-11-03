@@ -17,6 +17,7 @@ namespace Investments.Mapp
 
         public MappingProfile()
         {
+            //products
             CreateMap<ProductDB, CreateProductCommand>();
             CreateMap<CreateProductCommand, ProductDB>();
             CreateMap<ProductDB, CreateProductEvent>();

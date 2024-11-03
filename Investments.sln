@@ -20,6 +20,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Statement", "Statement\Statement.csproj", "{1BF0FA84-547D-4DE4-8EFF-37847C8123CB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers", "Customers\Customers.csproj", "{A49ED16B-C7B9-4F11-A06D-6C7EA06FF898}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8B99BBC2-0866-4433-8C77-FB8ED46B9ADB} = {8B99BBC2-0866-4433-8C77-FB8ED46B9ADB}
+		{B973D2A7-812F-4CFC-9DCA-4DBAEED69810} = {B973D2A7-812F-4CFC-9DCA-4DBAEED69810}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portfolio", "Portfolio\Portfolio.csproj", "{38F56F4C-BD1D-4FD7-8C9D-6DADF79529E9}"
 EndProject
