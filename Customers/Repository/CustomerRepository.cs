@@ -35,19 +35,19 @@ namespace Customers.Repository
             return _eventCollection.Find(Builders<CustomerDB>.Filter.Empty).ToListAsync(cancellationToken);
         }
 
-        async Task<CustomerDB> ICustomerRepository.GetBy(GetByCustomerCommand command, CancellationToken cancellationToken)
+        public async Task<CustomerDB> GetBy(string? user, string? fullName, ulong? id, CancellationToken cancellationToken)
         {
             var filter = Builders<CustomerDB>.Filter.Empty;
-            if (command.User != null) { 
-                filter = Builders<CustomerDB>.Filter.Eq(x => x.User, command.User);
+            if (user != null) { 
+                filter = Builders<CustomerDB>.Filter.Eq(x => x.User, user);
             }
-            else if (command.FullName != null)
+            else if (fullName != null)
             {
-                filter = Builders<CustomerDB>.Filter.Eq(x => x.FullName, command.FullName);
+                filter = Builders<CustomerDB>.Filter.Eq(x => x.FullName, fullName);
             }
-            else if (command.Id != null)
+            else if (id != null)
             {
-                filter = Builders<CustomerDB>.Filter.Eq(x => x.Id, command.Id);
+                filter = Builders<CustomerDB>.Filter.Eq(x => x.Id, id);
             }
 
             var result = await _eventCollection.Find(filter).FirstOrDefaultAsync(cancellationToken);

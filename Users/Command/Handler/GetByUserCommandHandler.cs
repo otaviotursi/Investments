@@ -1,4 +1,4 @@
-﻿using Customers.Repository.Interface;
+﻿using Users.Repository.Interface;
 using Infrastructure.Repository.Entities;
 using MediatR;
 using System;
@@ -7,20 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Customers.Command.Handler
+namespace Users.Command.Handler
 {
-    internal class GetByCustomerCommandHandler : IRequestHandler<GetByCustomerCommand, CustomerDB>
+    internal class GetByUserCommandHandler : IRequestHandler<GetByUserCommand, UserDB>
     {
         private readonly IMediator _mediator;
-        private readonly ICustomerRepository _repository;
+        private readonly IUserRepository _repository;
 
-        public GetByCustomerCommandHandler(IMediator mediator, ICustomerRepository repository)
+        public GetByUserCommandHandler(IMediator mediator, IUserRepository repository)
         {
             _mediator = mediator;
             _repository = repository;
         }
 
-        public async Task<CustomerDB> Handle(GetByCustomerCommand command, CancellationToken cancellationToken)
+        public async Task<UserDB> Handle(GetByUserCommand command, CancellationToken cancellationToken)
         {
             try
             {

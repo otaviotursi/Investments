@@ -12,7 +12,7 @@ namespace Customers.Repository.Interface
     {
         Task DeleteAsync(ulong id, CancellationToken cancellationToken);
         Task<List<CustomerDB>> GetAll(CancellationToken cancellationToken);
-        Task<CustomerDB> GetBy(GetByCustomerCommand command, CancellationToken cancellationToken);
+        Task<CustomerDB> GetBy(string? user, string? fullName, ulong? id, CancellationToken cancellationToken);
         Task InsertAsync(CustomerDB customer, CancellationToken cancellationToken);
         Task UpdateAsync(CustomerDB customer, CancellationToken cancellationToken);
     }

@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Customers.Command
+namespace Users.Command
 {
-    public class GetByCustomerCommand : MediatR.IRequest<CustomerDB>
+    public class GetByUserCommand : MediatR.IRequest<UserDB>
     {
-        public GetByCustomerCommand()
+        public GetByUserCommand()
         {
         }
-        public GetByCustomerCommand(ulong? id, string? fullName, string? user)
+        public GetByUserCommand(ulong? id, string? fullName, string? user)
         {
             Id = id;
             FullName = fullName;

@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Investments", "Investments.
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Users", "Users\Users.csproj", "{D820DD2B-2894-40AE-B953-31595940E340}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8B99BBC2-0866-4433-8C77-FB8ED46B9ADB} = {8B99BBC2-0866-4433-8C77-FB8ED46B9ADB}
+		{B973D2A7-812F-4CFC-9DCA-4DBAEED69810} = {B973D2A7-812F-4CFC-9DCA-4DBAEED69810}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Products", "Products\Products.csproj", "{A4572E30-8E56-4EE7-8C7C-1F6B1348F315}"
 	ProjectSection(ProjectDependencies) = postProject

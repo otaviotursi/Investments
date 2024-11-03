@@ -17,6 +17,8 @@ using Products.Command.Handler;
 using Products.Repository;
 using Products.Repository.Interface;
 using Products.Service.Kafka;
+using Users.Repository;
+using Users.Repository.Interface;
 using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
 
 namespace Investments
@@ -83,6 +85,14 @@ namespace Investments
                     sp.GetRequiredService<IMongoClient>(),
                     configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
                     configuration.GetConnectionString("CustomerCollectionName")  // Nome correto da coleção
+                ));
+
+            // Registrar o UserRepository com os valores diretamente
+            services.AddScoped<IUserRepository>(sp =>
+                new UserRepository(
+                    sp.GetRequiredService<IMongoClient>(),
+                    configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
+                    configuration.GetConnectionString("UserCollectionName")  // Nome correto da coleção
                 ));
         }
 
