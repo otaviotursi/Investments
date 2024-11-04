@@ -1,5 +1,6 @@
 ﻿using Infrastructure.Repository.Entities;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Products.Repository.Interface;
 using System;
 using System.Collections.Generic;
@@ -72,6 +73,20 @@ namespace Products.Repository
             var filter = Builders<ProductDB>.Filter.Eq(x => x.Id, id);
 
             var result = _eventCollection.Find(filter).FirstOrDefaultAsync(cancellationToken);
+
+            return result;
+        }
+
+        public Task<List<ProductDB>> GetExpiritionByDateAll(int expirationDay, CancellationToken cancellationToken)
+        {
+            DateTime dataAtual = DateTime.Now;
+            DateTime dataLimite = dataAtual.AddDays(expirationDay);
+
+            // Filtro para produtos com data de expiração dentro dos próximos 7 dias
+            var filter = Builders<ProductDB>.Filter.Gte(x => x.ExpirationDate, dataAtual) &
+                         Builders<ProductDB>.Filter.Lte(x => x.ExpirationDate, dataLimite);
+
+            var result = _eventCollection.Find(filter).ToListAsync(cancellationToken);
 
             return result;
         }

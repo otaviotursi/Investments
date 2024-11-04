@@ -3,6 +3,9 @@ using Customers.Repository;
 using Customers.Repository.Interface;
 using FluentValidation;
 using Infrastructure.Cache;
+using Infrastructure.Email;
+using Infrastructure.Email.Interface;
+using Infrastructure.QuartzJobs;
 using Infrastructure.Repository;
 using Infrastructure.Services;
 using Investments.Infrastructure.Kafka;
@@ -17,6 +20,7 @@ using Products.Command.Handler;
 using Products.Repository;
 using Products.Repository.Interface;
 using Products.Service.Kafka;
+using Quartz;
 using Users.Repository;
 using Users.Repository.Interface;
 using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
@@ -28,11 +32,26 @@ namespace Investments
         public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
             AddDependencies(services, configuration);
+            AddCronJob(services, configuration);
             AddRedisCache(services, configuration);
             AddMongoDB(services, configuration);
             AddMediatR(services, configuration);
             AddRepositories(services, configuration);
             AddServices(services, configuration);
+        }
+
+        private static void AddCronJob(IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddQuartz(options =>
+            {
+                options.UseMicrosoftDependencyInjectionJobFactory();
+            });
+            services.AddQuartzHostedService(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
+            services.ConfigureOptions<ProductExpirationBackgroundJobSetup>();
+
         }
 
         private static void AddDependencies(IServiceCollection services, IConfiguration configuration)
@@ -52,6 +71,8 @@ namespace Investments
             services.Configure<KafkaConfig>(configuration.GetSection("Kafka"));
             services.AddHostedService<ProductKafkaConsumerService>();
             services.AddScoped<IKafkaProducerService, KafkaPublisherService>();
+            services.Configure<EmailConfig>(configuration.GetSection("EmailConfig"));
+            services.AddScoped<IEmailNotificationService, EmailNotificationService>();
         }
 
         private static void AddRepositories(IServiceCollection services, IConfiguration configuration)

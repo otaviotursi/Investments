@@ -10,6 +10,7 @@ namespace Products.Repository.Interface
     public interface IReadProductRepository
     {
         Task<List<ProductDB>> GetAll(CancellationToken cancellationToken);
+        Task<List<ProductDB>> GetExpiritionByDateAll(int expirationDay, CancellationToken cancellationToken);
         Task InsertAsync(ProductDB ProductDB, CancellationToken cancellationToken);
         Task UpdateAsync(ProductDB ProductDB, CancellationToken cancellationToken);
         Task DeleteAsync(Guid id, CancellationToken cancellationToken);
