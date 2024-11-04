@@ -31,6 +31,19 @@ namespace Investments.Mapp
             CreateMap<UpdateProductEvent, ProductDB>();
             CreateMap<UpdateProductCommand, UpdateProductEvent>();
             CreateMap<UpdateProductEvent, UpdateProductCommand>();
+
+
+            CreateMap<UserDB, Users.Command.UpdateUserCommand>();
+            CreateMap<Users.Command.UpdateUserCommand, UserDB > ();
+            CreateMap<UserDB, Users.Command.CreateUserCommand>();
+            CreateMap<Users.Command.CreateUserCommand, UserDB>();
+
+
+            CreateMap<CustomerDB, Customers.Command.UpdateCustomerCommand>();
+            CreateMap<Customers.Command.UpdateCustomerCommand, CustomerDB>();
+            CreateMap<CustomerDB, Customers.Command.CreateCustomerCommand>();
+            CreateMap<Customers.Command.CreateCustomerCommand, CustomerDB>();
+
         }
     }
 }
