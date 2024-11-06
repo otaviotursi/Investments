@@ -30,6 +30,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Customers", "Customers\Cust
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Portfolio", "Portfolio\Portfolio.csproj", "{38F56F4C-BD1D-4FD7-8C9D-6DADF79529E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1BF0FA84-547D-4DE4-8EFF-37847C8123CB} = {1BF0FA84-547D-4DE4-8EFF-37847C8123CB}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "InfraStructure\Infrastructure.csproj", "{8B99BBC2-0866-4433-8C77-FB8ED46B9ADB}"
 	ProjectSection(ProjectDependencies) = postProject

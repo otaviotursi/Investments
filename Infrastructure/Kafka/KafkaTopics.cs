@@ -16,5 +16,6 @@
         // Tópico para notificações de vencimento de produtos financeiros
         public const string ProductExpiryNotificationTopic = "product-expiry-notification";
 
+        public const string InsertCustomerPorftolioStatement = "insert-customer-portfolio-statement";
     }
 }

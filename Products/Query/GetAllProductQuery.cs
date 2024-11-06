@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace Products.Command
 {
-    public class GetAllProductCommand : MediatR.IRequest<List<ProductDB>>
+    public class GetAllProductQuery : MediatR.IRequest<List<ProductDB>>
     {
-        public GetAllProductCommand()
+        public GetAllProductQuery()
         {
         }
 

@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Products.Command
 {
-    public class GetProductByNameCommand : MediatR.IRequest<ProductDB>
+    public class GetProductByNameQuery : MediatR.IRequest<ProductDB>
     {
-        public GetProductByNameCommand()
+        public GetProductByNameQuery()
         {
         }
-        public GetProductByNameCommand(string name)
+        public GetProductByNameQuery(string name)
         {
             Name = name;
         }

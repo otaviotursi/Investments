@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Products.Command
+namespace Products.Query
 {
-    public class GetStatementByProductCommand : MediatR.IRequest<List<ProductDB>>
+    public class GetStatementByProductQuery : MediatR.IRequest<List<ProductDB>>
     {
-        public GetStatementByProductCommand()
+        public GetStatementByProductQuery()
         {
         }
-        public GetStatementByProductCommand(string? name, string? user, DateTime? expirationDate)
+        public GetStatementByProductQuery(string? name, string? user, DateTime? expirationDate)
         {
             Name = name;
             User = user;

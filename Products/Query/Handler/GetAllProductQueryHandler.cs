@@ -10,22 +10,22 @@ using System.Threading.Tasks;
 
 namespace Products.Command.Handler
 {
-    public class GetProductByNameCommandHandler : IRequestHandler<GetProductByNameCommand, ProductDB>
+    public class GetAllProductQueryHandler : IRequestHandler<GetAllProductQuery, List<ProductDB>>
     {
         private readonly IMediator _mediator;
         private readonly IReadProductRepository _repository;
 
-        public GetProductByNameCommandHandler(IMediator mediator, IReadProductRepository repositoryWrite)
+        public GetAllProductQueryHandler(IMediator mediator, IReadProductRepository repositoryWrite)
         {
             _mediator = mediator;
             _repository = repositoryWrite;
         }
 
-        public async Task<ProductDB> Handle(GetProductByNameCommand command, CancellationToken cancellationToken)
+        public async Task<List<ProductDB>> Handle(GetAllProductQuery command, CancellationToken cancellationToken)
         {
             try
             {
-                return await _repository.GetByName(command.Name, cancellationToken);
+                return await _repository.GetAll(cancellationToken);
             }
             catch (Exception ex)
             {

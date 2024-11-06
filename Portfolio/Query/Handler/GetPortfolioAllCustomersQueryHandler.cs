@@ -1,27 +1,26 @@
 ﻿using Infrastructure.Repository.Entities;
 using MediatR;
-using Products.Event;
-using Products.Repository.Interface;
+using Portfolio.Repository.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Products.Command.Handler
+namespace Portfolio.Command.Handler
 {
-    public class GetAllProductCommandHandler : IRequestHandler<GetAllProductCommand, List<ProductDB>>
+    internal class GetPortfolioAllCustomersQueryHandler : IRequestHandler<GetPortfolioAllCustomersQuery, List<PortfolioDB>>
     {
         private readonly IMediator _mediator;
-        private readonly IReadProductRepository _repository;
+        private readonly IPortfolioRepository _repository;
 
-        public GetAllProductCommandHandler(IMediator mediator, IReadProductRepository repositoryWrite)
+        public GetPortfolioAllCustomersQueryHandler(IMediator mediator, IPortfolioRepository repositoryWrite)
         {
             _mediator = mediator;
             _repository = repositoryWrite;
         }
 
-        public async Task<List<ProductDB>> Handle(GetAllProductCommand command, CancellationToken cancellationToken)
+        public async Task<List<PortfolioDB>> Handle(GetPortfolioAllCustomersQuery command, CancellationToken cancellationToken)
         {
             try
             {

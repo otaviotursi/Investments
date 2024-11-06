@@ -69,7 +69,7 @@ namespace Investments
         {
 
             services.Configure<KafkaConfig>(configuration.GetSection("Kafka"));
-            services.AddHostedService<ProductKafkaConsumerService>();
+            services.AddHostedService<StatementKafkaConsumerService>();
             services.AddScoped<IKafkaProducerService, KafkaPublisherService>();
             services.Configure<EmailConfig>(configuration.GetSection("EmailConfig"));
             services.AddScoped<IEmailNotificationService, EmailNotificationService>();

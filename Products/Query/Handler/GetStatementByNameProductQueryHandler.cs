@@ -8,20 +8,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Products.Command.Handler
+namespace Products.Query.Handler
 {
-    public class GetStatementByProductCommandHandler : IRequestHandler<GetStatementByProductCommand, List<ProductDB>>
+    public class GetStatementByProductQueryHandler : IRequestHandler<GetStatementByProductQuery, List<ProductDB>>
     {
         private readonly IMediator _mediator;
         private readonly IWriteProductRepository _repository;
 
-        public GetStatementByProductCommandHandler(IMediator mediator, IWriteProductRepository repositoryWrite)
+        public GetStatementByProductQueryHandler(IMediator mediator, IWriteProductRepository repositoryWrite)
         {
             _mediator = mediator;
             _repository = repositoryWrite;
         }
 
-        public async Task<List<ProductDB>> Handle(GetStatementByProductCommand command, CancellationToken cancellationToken)
+        public async Task<List<ProductDB>> Handle(GetStatementByProductQuery command, CancellationToken cancellationToken)
         {
             try
             {

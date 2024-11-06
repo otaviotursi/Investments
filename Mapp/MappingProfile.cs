@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Infrastructure.Repository.Entities;
 using MongoDB.Bson;
+using Portfolio.Command;
 using Products.Command;
 using Products.Event;
-using StackExchange.Redis;
+using Statement.Event;
 
 namespace Investments.Mapp
 {
@@ -44,6 +45,15 @@ namespace Investments.Mapp
             CreateMap<Customers.Command.UpdateCustomerCommand, CustomerDB>();
             CreateMap<CustomerDB, Customers.Command.CreateCustomerCommand>();
             CreateMap<Customers.Command.CreateCustomerCommand, CustomerDB>();
+
+
+            CreateMap<PortfolioDB, OperateProductCustomerCommand>();
+            CreateMap<OperateProductCustomerCommand, PortfolioDB>();
+            CreateMap<OperateProductCustomerCommand, InsertPortfolioStatementByCustomerEvent>();
+            CreateMap<InsertPortfolioStatementByCustomerEvent, OperateProductCustomerCommand>();
+
+            
+
 
         }
     }

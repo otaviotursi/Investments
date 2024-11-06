@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Products.Repository.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +14,10 @@ using System.Threading.Tasks;
 using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
 using IEmailNotificationService = Infrastructure.Email.Interface.IEmailNotificationService;
 using Infrastructure.Email;
+using Statement.Repository.Interface;
 
 
-namespace Products.Service.Kafka
+namespace Statement.Service.Kafka
 {
     internal class StatementKafkaConsumerService : BackgroundService
     {
@@ -28,7 +28,6 @@ namespace Products.Service.Kafka
         private readonly ILogger<StatementKafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
-        private readonly IEmailNotificationService _emailNotificationService;
 
 
         public StatementKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<StatementKafkaConsumerService> logger, IEmailNotificationService emailNotificationService, IOptions<EmailConfig> emailConfig)
@@ -40,12 +39,7 @@ namespace Products.Service.Kafka
             // Lista de tópicos que o consumidor vai ler
             _topics = new List<string>
             {
-                KafkaTopics.InsertProductTopic,
-                KafkaTopics.DeleteProductTopic,
-                KafkaTopics.InvestmentPurchasedTopic,
-                KafkaTopics.InvestmentSoldTopic,
-                KafkaTopics.UpdateProductTopic,
-                KafkaTopics.ProductExpiryNotificationTopic
+                KafkaTopics.InsertCustomerPorftolioStatement
             };
             var config = new ConsumerConfig
             {
@@ -56,7 +50,6 @@ namespace Products.Service.Kafka
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
-            _emailNotificationService = emailNotificationService;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -78,7 +71,7 @@ namespace Products.Service.Kafka
 
                             using (var scope = _serviceProvider.CreateScope())
                             {
-                                var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+                                var repository = scope.ServiceProvider.GetRequiredService<IPortfolioStatementRepository>();
                                 await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, stoppingToken);
                             }
 
@@ -105,32 +98,15 @@ namespace Products.Service.Kafka
 
 
 
-        private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(string topic, string key, string value, IPortfolioStatementRepository repository, CancellationToken stoppingToken)
         {
             // Processamento da mensagem usando o repository scoped
             switch (topic)
             {
-                case KafkaTopics.InsertProductTopic:
+                case KafkaTopics.InsertCustomerPorftolioStatement:
                     _logger.LogInformation($"Processando mensagem de inserção. Key: {key}, Value: {value}");
-                    var productInsert = JsonConvert.DeserializeObject<ProductDB>(value);
-                    await repository.InsertAsync(productInsert, stoppingToken);
-                    break;
-
-                case KafkaTopics.UpdateProductTopic:
-                    _logger.LogInformation($"Processando mensagem de atualização. Key: {key}, Value: {value}");
-                    var productUpdate = JsonConvert.DeserializeObject<ProductDB>(value);
-                    await repository.UpdateAsync(productUpdate, stoppingToken);
-                    break;
-
-                case KafkaTopics.DeleteProductTopic:
-                    _logger.LogInformation($"Processando mensagem de exclusão. Key: {key}, Value: {value}");
-                    var productDelete = JsonConvert.DeserializeObject<ProductDB>(value);
-                    await repository.DeleteAsync(productDelete.Id, stoppingToken);
-                    break;
-
-                case KafkaTopics.ProductExpiryNotificationTopic:
-                    _logger.LogInformation($"Processando mensagem de validação de expiração de produtos");
-                    await SendProductExpirationEmail(repository, stoppingToken);
+                    var insertProduct = JsonConvert.DeserializeObject<PortfolioStatementDB>(value);
+                    await repository.InsertAsync(insertProduct, stoppingToken);
                     break;
 
                 default:
@@ -139,23 +115,6 @@ namespace Products.Service.Kafka
             }
         }
 
-        private async Task SendProductExpirationEmail(IReadProductRepository repository, CancellationToken stoppingToken)
-        {
-            var listProducts = await repository.GetExpiritionByDateAll(_daysToExpiration, stoppingToken);
-            StringBuilder emailBody = new StringBuilder();
-            foreach (var product in listProducts)
-            {
-                TimeSpan diferenca = product.ExpirationDate - DateTime.Now;
-
-                if( diferenca.TotalDays <= 7 && diferenca.TotalDays >= 0)
-                    emailBody.Append($"Produto id {product.Id} - {product.Name}, Está para expirar em: {product.ExpirationDate}");
-            }
-            if (emailBody.Length > 0)
-            {
-                var emailRequest = new EmailRequest(_emailConfig.EmailSendExpiration, "Produtos prestes a expirar", emailBody.ToString());
-                await _emailNotificationService.SendEmailAsync(emailRequest);
-            }
-        }
     }
 
 }
