@@ -25,6 +25,7 @@ namespace Investments.Mapp
             CreateMap<CreateProductCommand, CreateProductEvent>();
             CreateMap<CreateProductEvent, CreateProductCommand>();
 
+
             CreateMap<ProductDB, UpdateProductCommand>();
             CreateMap<UpdateProductCommand, ProductDB>();
             CreateMap<ProductDB, UpdateProductEvent>();

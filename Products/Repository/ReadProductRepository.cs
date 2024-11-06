@@ -82,7 +82,6 @@ namespace Products.Repository
             DateTime dataAtual = DateTime.Now;
             DateTime dataLimite = dataAtual.AddDays(expirationDay);
 
-            // Filtro para produtos com data de expiração dentro dos próximos 7 dias
             var filter = Builders<ProductDB>.Filter.Gte(x => x.ExpirationDate, dataAtual) &
                          Builders<ProductDB>.Filter.Lte(x => x.ExpirationDate, dataLimite);
 
