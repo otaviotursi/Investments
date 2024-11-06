@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Products.Command;
+using Products.Query;
 using Products.Repository.Interface;
 
 namespace Investments.Controllers
@@ -40,12 +41,12 @@ namespace Investments.Controllers
         {
             if(productName == null)
             {
-                var response = await _mediator.Send(new GetAllProductCommand(), cancellationToken);
+                var response = await _mediator.Send(new GetAllProductQuery(), cancellationToken);
                 return Ok(response);
 
             } else
             {
-                var response = await _mediator.Send(new GetProductByNameCommand(productName), cancellationToken);
+                var response = await _mediator.Send(new GetProductByNameQuery(productName), cancellationToken);
                 return Ok(response);
             }
 
@@ -53,7 +54,7 @@ namespace Investments.Controllers
         [HttpGet("statement")]
         public async Task<IActionResult> GetStatementByName([FromQuery] string? user, [FromQuery] string? productName, [FromQuery] DateTime? expirationDate, CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetStatementByProductCommand(user, productName, expirationDate), cancellationToken);
+            var response = await _mediator.Send(new GetStatementByProductQuery(user, productName, expirationDate), cancellationToken);
 
             return Ok(response);
         }

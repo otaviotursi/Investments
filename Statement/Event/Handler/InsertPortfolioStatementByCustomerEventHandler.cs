@@ -20,7 +20,7 @@ namespace Statement.Command.Handler
         }
         public async Task Handle(InsertPortfolioStatementByCustomerEvent productEvent, CancellationToken cancellationToken)
         {
-            await _kafkaProducerService.PublishMessageAsync(KafkaTopics.InsertCustomerPorftolioStatement, productEvent.Id.ToString(), JsonConvert.SerializeObject(productEvent));
+            await _kafkaProducerService.PublishMessageAsync(KafkaTopics.InsertCustomerPorftolioStatement, productEvent.CustomerId.ToString(), JsonConvert.SerializeObject(productEvent));
         }
     }
 }
