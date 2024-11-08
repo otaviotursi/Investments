@@ -27,17 +27,17 @@ namespace Infrastructure.QuartzJobs
     {
         public void Configure(QuartzOptions options)
         {
-            var emailJobKey = JobKey.Create(nameof(ProductExpirationBackgroundJob));
-            options
-                .AddJob<ProductExpirationBackgroundJob>(jobBuilder => jobBuilder.WithIdentity(emailJobKey))
-                .AddTrigger(trigger =>
-                    trigger
-                        .ForJob(emailJobKey)
-                        .WithCronSchedule("0 0 6 ? * * *"))
-                .AddTrigger(trigger =>
-                    trigger
-                        .ForJob(emailJobKey)
-                        .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(8).RepeatForever()));
+            //var emailJobKey = JobKey.Create(nameof(ProductExpirationBackgroundJob));
+            //options
+            //    .AddJob<ProductExpirationBackgroundJob>(jobBuilder => jobBuilder.WithIdentity(emailJobKey))
+            //    .AddTrigger(trigger =>
+            //        trigger
+            //            .ForJob(emailJobKey)
+            //            .WithCronSchedule("0 0 6 ? * * *"))
+            //    .AddTrigger(trigger =>
+            //        trigger
+            //            .ForJob(emailJobKey)
+            //            .WithSimpleSchedule(schedule => schedule.WithIntervalInHours(8).RepeatForever()));
         }
     }
 }

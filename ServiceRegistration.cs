@@ -15,12 +15,21 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Portfolio.Command.Handler;
+using Portfolio.Repository;
+using Portfolio.Repository.Interface;
 using Products.Command;
 using Products.Command.Handler;
+using Products.Query.Handler;
 using Products.Repository;
 using Products.Repository.Interface;
 using Products.Service.Kafka;
 using Quartz;
+using Statement.Command;
+using Statement.Command.Handler;
+using Statement.Repository;
+using Statement.Repository.Interface;
+using Statement.Service.Kafka;
 using Users.Repository;
 using Users.Repository.Interface;
 using KafkaConfig = Infrastructure.Kafka.KafkaConfig;
@@ -61,8 +70,13 @@ namespace Investments
 
             //services.AddTransient<INotificationHandler<CreateProductEvent>, CreateProductEventHandler>();
 
-            // Registrar o MongoClient
-
+            services.AddScoped<GetPortfolioStatementByCustomerQueryHandler>();
+            services.AddScoped<GetAllProductQueryHandler>();
+            services.AddScoped<GetProductByNameQueryHandler>();
+            services.AddScoped<GetStatementByProductQueryHandler>();
+            services.AddScoped<GetPortfolioAllCustomersQueryHandler>();
+            services.AddScoped<GetPortfolioByCustomerQueryHandler>();
+            services.AddScoped<IEmailNotificationService, EmailNotificationService>();
         }
 
         private static void AddServices(IServiceCollection services, IConfiguration configuration)
@@ -70,9 +84,10 @@ namespace Investments
 
             services.Configure<KafkaConfig>(configuration.GetSection("Kafka"));
             services.AddHostedService<StatementKafkaConsumerService>();
+            services.AddHostedService<ProductKafkaConsumerService>();
             services.AddScoped<IKafkaProducerService, KafkaPublisherService>();
             services.Configure<EmailConfig>(configuration.GetSection("EmailConfig"));
-            services.AddScoped<IEmailNotificationService, EmailNotificationService>();
+
         }
 
         private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
@@ -115,6 +130,24 @@ namespace Investments
                     configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
                     configuration.GetConnectionString("UserCollectionName")  // Nome correto da coleção
                 ));
+
+
+            // Registrar o PortfolioRepository com os valores diretamente
+            services.AddScoped<IPortfolioRepository>(sp =>
+                new PortfolioRepository(
+                    sp.GetRequiredService<IMongoClient>(),
+                    configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
+                    configuration.GetConnectionString("PortfolioCollectionName")  // Nome correto da coleção
+                ));
+
+            // Registrar o PortfolioRepository com os valores diretamente
+            services.AddScoped<IPortfolioStatementRepository>(sp =>
+                new PortfolioStatementRepository(
+                    sp.GetRequiredService<IMongoClient>(),
+                    configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
+                    configuration.GetConnectionString("PortfolioStatementCollectionName")  // Nome correto da coleção
+                ));
+            
         }
 
         private static void AddMediatR(IServiceCollection services, IConfiguration configuration)

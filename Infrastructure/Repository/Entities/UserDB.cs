@@ -22,7 +22,7 @@ namespace Infrastructure.Repository.Entities
             Id = id;
         }
 
-        public ulong Id { get; set; }
+        public ulong? Id { get; set; }
         public string FullName { get; set; }
         public string User { get; set; }
         public DateTime CreateUserDate { get; set; } = DateTime.Now;

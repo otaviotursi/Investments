@@ -30,7 +30,7 @@ namespace Statement.Service.Kafka
         private readonly IConsumer<string, string> _consumer;
 
 
-        public StatementKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<StatementKafkaConsumerService> logger, IEmailNotificationService emailNotificationService, IOptions<EmailConfig> emailConfig)
+        public StatementKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<StatementKafkaConsumerService> logger, IOptions<EmailConfig> emailConfig)
         {
             _emailConfig = emailConfig.Value;
             _kafkaConfig = kafkaConfig.Value;

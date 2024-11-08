@@ -19,19 +19,18 @@ using Infrastructure.Email;
 
 namespace Products.Service.Kafka
 {
-    internal class StatementKafkaConsumerService : BackgroundService
+    internal class ProductKafkaConsumerService : BackgroundService
     {
         private readonly KafkaConfig _kafkaConfig;
         private readonly EmailConfig _emailConfig;
         private readonly int _daysToExpiration = 7;
         private readonly IServiceProvider _serviceProvider; // Injeção de IServiceProvider
-        private readonly ILogger<StatementKafkaConsumerService> _logger;
+        private readonly ILogger<ProductKafkaConsumerService> _logger;
         private readonly List<string> _topics;
         private readonly IConsumer<string, string> _consumer;
-        private readonly IEmailNotificationService _emailNotificationService;
 
 
-        public StatementKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<StatementKafkaConsumerService> logger, IEmailNotificationService emailNotificationService, IOptions<EmailConfig> emailConfig)
+        public ProductKafkaConsumerService(IServiceProvider serviceProvider, IOptions<KafkaConfig> kafkaConfig, ILogger<ProductKafkaConsumerService> logger, IOptions<EmailConfig> emailConfig)
         {
             _emailConfig = emailConfig.Value;
             _kafkaConfig = kafkaConfig.Value;
@@ -56,56 +55,56 @@ namespace Products.Service.Kafka
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();
-            _emailNotificationService = emailNotificationService;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
             _consumer.Subscribe(_topics);
             _logger.LogInformation($"Inscrito nos tópicos: {string.Join(", ", _topics)}");
-
-
-            try
+            using (var scope = _serviceProvider.CreateScope())
             {
-                while (!stoppingToken.IsCancellationRequested)
+                var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+                var emailNotificationService = scope.ServiceProvider.GetRequiredService<IEmailNotificationService>();
+
+
+                try
                 {
-                    try
+                    while (!stoppingToken.IsCancellationRequested)
                     {
-                        var consumeResult = _consumer.Consume(stoppingToken);
-                        if (consumeResult != null)
+                        try
                         {
-                            _logger.LogInformation($"Mensagem recebida do tópico {consumeResult.Topic}: {consumeResult.Message.Value}");
-
-                            using (var scope = _serviceProvider.CreateScope())
+                            var consumeResult = _consumer.Consume(stoppingToken);
+                            if (consumeResult != null)
                             {
-                                var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
-                                await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, stoppingToken);
+                                _logger.LogInformation($"Mensagem recebida do tópico {consumeResult.Topic}: {consumeResult.Message.Value}");
+
+                                await ProcessMessageAsync(consumeResult.Topic, consumeResult.Message.Key, consumeResult.Message.Value, repository, emailNotificationService, stoppingToken);
+
+                                _consumer.Commit();
                             }
-
-                            _consumer.Commit();
                         }
-                    }
-                    catch (ConsumeException e)
-                    {
-                        _logger.LogError($"Erro ao consumir mensagem: {e.Message}");
-                    }
+                        catch (ConsumeException e)
+                        {
+                            _logger.LogError($"Erro ao consumir mensagem: {e.Message}");
+                        }
 
-                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                    }
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.LogInformation("Consumo de Kafka cancelado.");
-            }
-            finally
-            {
-                _consumer.Close();
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Consumo de Kafka cancelado.");
+                }
+                finally
+                {
+                    _consumer.Close();
+                }
             }
         }
 
 
 
-        private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, IEmailNotificationService emailNotificationService, CancellationToken stoppingToken)
         {
             // Processamento da mensagem usando o repository scoped
             switch (topic)
@@ -130,7 +129,7 @@ namespace Products.Service.Kafka
 
                 case KafkaTopics.ProductExpiryNotificationTopic:
                     _logger.LogInformation($"Processando mensagem de validação de expiração de produtos");
-                    await SendProductExpirationEmail(repository, stoppingToken);
+                    await SendProductExpirationEmail(repository, emailNotificationService, stoppingToken);
                     break;
 
                 default:
@@ -139,7 +138,7 @@ namespace Products.Service.Kafka
             }
         }
 
-        private async Task SendProductExpirationEmail(IReadProductRepository repository, CancellationToken stoppingToken)
+        private async Task SendProductExpirationEmail(IReadProductRepository repository, IEmailNotificationService emailNotificationService, CancellationToken stoppingToken)
         {
             var listProducts = await repository.GetExpiritionByDateAll(_daysToExpiration, stoppingToken);
             StringBuilder emailBody = new StringBuilder();
@@ -147,13 +146,13 @@ namespace Products.Service.Kafka
             {
                 TimeSpan diferenca = product.ExpirationDate - DateTime.Now;
 
-                if( diferenca.TotalDays <= 7 && diferenca.TotalDays >= 0)
+                if (diferenca.TotalDays <= 7 && diferenca.TotalDays >= 0)
                     emailBody.Append($"Produto id {product.Id} - {product.Name}, Está para expirar em: {product.ExpirationDate}");
             }
             if (emailBody.Length > 0)
             {
                 var emailRequest = new EmailRequest(_emailConfig.EmailSendExpiration, "Produtos prestes a expirar", emailBody.ToString());
-                await _emailNotificationService.SendEmailAsync(emailRequest);
+                await emailNotificationService.SendEmailAsync(emailRequest);
             }
         }
     }

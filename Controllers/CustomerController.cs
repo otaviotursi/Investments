@@ -35,7 +35,7 @@ namespace Investments.Controllers
         {
             if(id == null && user == null && fullName == null)
             {
-                var response = await _mediator.Send(new GetAllCustomerCommand(), cancellationToken);
+                var response = await _mediator.Send(new GetAllCustomerQuery(), cancellationToken);
                 return Ok(response);
 
             } else

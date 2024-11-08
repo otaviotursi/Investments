@@ -10,7 +10,6 @@
 
   <ItemGroup>
     <Folder Include="Event\Handler\" />
-    <Folder Include="Query\Handler\" />
     <Folder Include="Service\Kafka\" />
   </ItemGroup>
 

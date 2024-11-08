@@ -34,7 +34,7 @@ namespace Infrastructure.Services
             using var producer = new ProducerBuilder<string, string>(config).Build();
             try
             {
-                var result = await producer.ProduceAsync(topic, null);
+                var result = await producer.ProduceAsync(topic, new Message<string, string> { });
 
                 _logger.LogInformation($"Mensagem enviada para o tópico {topic}. Offset: {result.Offset}");
                 return true;

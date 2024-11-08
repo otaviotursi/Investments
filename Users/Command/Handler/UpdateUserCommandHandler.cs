@@ -30,7 +30,7 @@ namespace Users.Command.Handler
                 var User = _mapper.Map<UserDB>(command);
                 await _repositoryWrite.UpdateAsync(User, cancellationToken);
 
-                return await Task.FromResult("Cliente {id} alterado com sucesso");
+                return string.Format("Cliente {id} alterado com sucesso", command.FullName ?? command.User ?? command.Id.ToString());
             }
             catch (Exception ex)
             {

@@ -81,10 +81,11 @@ namespace Users.Repository
             var documentWithMaxId = await _eventCollection
                 .Find(new BsonDocument())
                 .Sort(Builders<UserDB>.Sort.Descending("id"))
-                .Limit(1)
-                .FirstOrDefaultAsync();
+                .ToListAsync();
 
-            return documentWithMaxId.Id;
+            var lastId = documentWithMaxId.Last().Id;
+
+            return lastId ?? 0;
         }
 
     }
