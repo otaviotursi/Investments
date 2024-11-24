@@ -72,7 +72,7 @@ namespace Investments
 
             services.AddScoped<GetPortfolioStatementByCustomerQueryHandler>();
             services.AddScoped<GetAllProductQueryHandler>();
-            services.AddScoped<GetProductByNameQueryHandler>();
+            services.AddScoped<GetProductByQueryHandler>();
             services.AddScoped<GetStatementByProductQueryHandler>();
             services.AddScoped<GetPortfolioAllCustomersQueryHandler>();
             services.AddScoped<GetPortfolioByCustomerQueryHandler>();
@@ -99,19 +99,19 @@ namespace Investments
 
 
             // Registrar o ProductReadRepository com os valores diretamente
-            services.AddSingleton<IReadProductRepository>(sp =>
-                new ReadProductRepository(
+            services.AddSingleton<IProductRepository>(sp =>
+                new ProductRepository(
                     sp.GetRequiredService<IMongoClient>(),
                     configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
-                    configuration.GetConnectionString("ProductsReadCollectionName")  // Nome correto da coleção
+                    configuration.GetConnectionString("ProductsCollectionName")  // Nome correto da coleção
                 ));
 
             // Registrar o ProductWriteRepository com os valores diretamente
-            services.AddScoped<IWriteProductRepository>(sp =>
-                new WriteProductRepository(
+            services.AddScoped<IProductStatementRepository>(sp =>
+                new ProductStatementRepository(
                     sp.GetRequiredService<IMongoClient>(),
                     configuration.GetConnectionString("DefaultDatabase"),  // Nome correto do banco de dados
-                    configuration.GetConnectionString("ProductsWriteCollectionName")  // Nome correto da coleção
+                    configuration.GetConnectionString("ProductsStatementCollectionName")  // Nome correto da coleção
                 ));
 
 

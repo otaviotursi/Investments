@@ -2,8 +2,7 @@
 using Users.Repository.Interface;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Users.Command;
-using Users.Repository.Interface;
+using Users.Query;
 
 namespace Investments.Controllers
 {
@@ -40,7 +39,7 @@ namespace Investments.Controllers
 
             } else
             {
-                var response = await _mediator.Send(new GetByUserCommand(id, fullName, user), cancellationToken);
+                var response = await _mediator.Send(new GetByUserQuery(id, fullName, user), cancellationToken);
                 return Ok(response);
             }
 

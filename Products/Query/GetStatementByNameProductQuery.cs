@@ -12,16 +12,19 @@ namespace Products.Query
         public GetStatementByProductQuery()
         {
         }
-        public GetStatementByProductQuery(string? name, string? user, DateTime? expirationDate)
+        public GetStatementByProductQuery(string? productName, ulong? userId, DateTime? expirationDate, Guid? productId)
         {
-            Name = name;
-            User = user;
+            Name = productName;
+            UserId = userId;
+            ProductId = productId;
             ExpirationDate = expirationDate;
         }
 
         public string? Name { get; set; }
-        public string? User { get; set; }
+        public ulong? UserId { get; set; }
         public DateTime? ExpirationDate { get; set; }
+        public Guid? ProductId { get; set; }
+        
 
     }
 }

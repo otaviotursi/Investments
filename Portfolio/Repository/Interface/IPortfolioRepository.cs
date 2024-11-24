@@ -11,7 +11,7 @@ namespace Portfolio.Repository.Interface
     {
         Task<List<PortfolioDB>> GetAll(CancellationToken cancellationToken);
         Task<PortfolioDB> GetByName(ulong customerId, CancellationToken cancellationToken);
-        Task InsertAsync(PortfolioDB product, CancellationToken cancellationToken);
-        Task RemoveAsync(PortfolioDB product, CancellationToken cancellationToken);
+        Task InsertAsync(PortfolioRequest product, CancellationToken cancellationToken);
+        Task RemoveAsync(PortfolioRequest product, CancellationToken cancellationToken);
     }
 }

@@ -46,7 +46,7 @@ namespace Statement.Service.Kafka
                 BootstrapServers = _kafkaConfig.BootstrapServers,
                 GroupId = _kafkaConfig.ConsumerGroupId, // Adicionar um GroupId para o consumidor
                 AutoOffsetReset = AutoOffsetReset.Earliest, // Garantir que comece do início se não houver offsets salvos
-                EnableAutoCommit = false // Commit manual após processamento
+                EnableAutoCommit = true // Commit manual após processamento
             };
 
             _consumer = new ConsumerBuilder<string, string>(config).Build();

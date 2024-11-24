@@ -14,12 +14,10 @@ namespace Products.Command.Handler
     public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, string>
     {
         private readonly IMediator _mediator;
-        private readonly IWriteProductRepository _repositoryWrite;
         private readonly IMapper _mapper;
-        public CreateProductCommandHandler(IMediator mediator, IWriteProductRepository repositoryWrite, IMapper mapper)
+        public CreateProductCommandHandler(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
-            _repositoryWrite = repositoryWrite;
             _mapper = mapper;
         }
 
@@ -28,7 +26,6 @@ namespace Products.Command.Handler
             try
             {
                 var product = _mapper.Map<ProductDB>(command);
-                await _repositoryWrite.InsertAsync(product, cancellationToken);
 
                 var productEvent = _mapper.Map<CreateProductEvent>(command);
                 await _mediator.Publish(productEvent);

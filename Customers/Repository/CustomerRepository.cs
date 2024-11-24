@@ -81,10 +81,11 @@ namespace Customers.Repository
             var documentWithMaxId = await _eventCollection
                 .Find(new BsonDocument())
                 .Sort(Builders<CustomerDB>.Sort.Descending("id"))
-                .Limit(1)
-                .FirstOrDefaultAsync();
+                .ToListAsync();
 
-            return documentWithMaxId.Id;
+            var lastId = documentWithMaxId.LastOrDefault()?.Id ?? 0;
+
+            return lastId;
         }
 
     }

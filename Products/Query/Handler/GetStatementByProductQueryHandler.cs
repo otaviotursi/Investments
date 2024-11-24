@@ -13,9 +13,9 @@ namespace Products.Query.Handler
     public class GetStatementByProductQueryHandler : IRequestHandler<GetStatementByProductQuery, List<ProductDB>>
     {
         private readonly IMediator _mediator;
-        private readonly IWriteProductRepository _repository;
+        private readonly IProductStatementRepository _repository;
 
-        public GetStatementByProductQueryHandler(IMediator mediator, IWriteProductRepository repositoryWrite)
+        public GetStatementByProductQueryHandler(IMediator mediator, IProductStatementRepository repositoryWrite)
         {
             _mediator = mediator;
             _repository = repositoryWrite;
@@ -25,7 +25,7 @@ namespace Products.Query.Handler
         {
             try
             {
-                return await _repository.GetStatementBy(command.Name, command.User, command.ExpirationDate, cancellationToken);
+                return await _repository.GetStatementBy(command.Name, command.UserId, command.ExpirationDate,command.ProductId, cancellationToken);
             }
             catch (Exception ex)
             {

@@ -47,8 +47,8 @@ namespace Investments.Mapp
             CreateMap<Customers.Command.CreateCustomerCommand, CustomerDB>();
 
 
-            CreateMap<PortfolioDB, OperateProductCustomerCommand>();
-            CreateMap<OperateProductCustomerCommand, PortfolioDB>();
+            CreateMap<PortfolioRequest, OperateProductCustomerCommand>();
+            CreateMap<OperateProductCustomerCommand, PortfolioRequest>();
             CreateMap<OperateProductCustomerCommand, InsertPortfolioStatementByCustomerEvent>();
             CreateMap<InsertPortfolioStatementByCustomerEvent, OperateProductCustomerCommand>();
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Portfolio.Command
 {
-    internal class OperateProductCustomerCommand : MediatR.IRequest<string>
+    public class OperateProductCustomerCommand : MediatR.IRequest<string>
     {
         public OperateProductCustomerCommand()
         {
@@ -24,7 +24,7 @@ namespace Portfolio.Command
         public Guid ProductId { get; set; }
         public ulong CustomerId { get; set; }
         public string ProductName { get; set; }
-        public ulong AmountNegotiated { get; set; }
+        public decimal AmountNegotiated { get; set; }
         public string OperationType { get; set; }
     }
 }

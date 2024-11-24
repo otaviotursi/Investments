@@ -43,6 +43,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\InfraStructure\Infrastructure.csproj" />
+		<ProjectReference Include="..\Products\Products.csproj" />
 		<ProjectReference Include="..\Statement\Statement.csproj" />
 	</ItemGroup>
 </Project>

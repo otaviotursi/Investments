@@ -63,7 +63,7 @@ namespace Products.Service.Kafka
             _logger.LogInformation($"Inscrito nos tópicos: {string.Join(", ", _topics)}");
             using (var scope = _serviceProvider.CreateScope())
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IReadProductRepository>();
+                var repository = scope.ServiceProvider.GetRequiredService<IProductRepository>();
                 var emailNotificationService = scope.ServiceProvider.GetRequiredService<IEmailNotificationService>();
 
 
@@ -104,7 +104,7 @@ namespace Products.Service.Kafka
 
 
 
-        private async Task ProcessMessageAsync(string topic, string key, string value, IReadProductRepository repository, IEmailNotificationService emailNotificationService, CancellationToken stoppingToken)
+        private async Task ProcessMessageAsync(string topic, string key, string value, IProductRepository repository, IEmailNotificationService emailNotificationService, CancellationToken stoppingToken)
         {
             // Processamento da mensagem usando o repository scoped
             switch (topic)
@@ -138,7 +138,7 @@ namespace Products.Service.Kafka
             }
         }
 
-        private async Task SendProductExpirationEmail(IReadProductRepository repository, IEmailNotificationService emailNotificationService, CancellationToken stoppingToken)
+        private async Task SendProductExpirationEmail(IProductRepository repository, IEmailNotificationService emailNotificationService, CancellationToken stoppingToken)
         {
             var listProducts = await repository.GetExpiritionByDateAll(_daysToExpiration, stoppingToken);
             StringBuilder emailBody = new StringBuilder();

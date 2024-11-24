@@ -30,7 +30,7 @@ namespace Customers.Command.Handler
                 var customer = _mapper.Map<CustomerDB>(command);
                 await _repositoryWrite.UpdateAsync(customer, cancellationToken);
 
-                return await Task.FromResult("Cliente {id} alterado com sucesso");
+                return string.Format("Cliente {0} alterado com sucesso", command.Id);
             }
             catch (Exception ex)
             {

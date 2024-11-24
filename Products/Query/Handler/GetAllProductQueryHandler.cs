@@ -13,9 +13,9 @@ namespace Products.Command.Handler
     public class GetAllProductQueryHandler : IRequestHandler<GetAllProductQuery, List<ProductDB>>
     {
         private readonly IMediator _mediator;
-        private readonly IReadProductRepository _repository;
+        private readonly IProductRepository _repository;
 
-        public GetAllProductQueryHandler(IMediator mediator, IReadProductRepository repositoryWrite)
+        public GetAllProductQueryHandler(IMediator mediator, IProductRepository repositoryWrite)
         {
             _mediator = mediator;
             _repository = repositoryWrite;

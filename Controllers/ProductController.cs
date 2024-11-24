@@ -11,9 +11,9 @@ namespace Investments.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IReadProductRepository _productReadRepository;
+        private readonly IProductRepository _productReadRepository;
 
-        public ProductController(IMediator mediator, IReadProductRepository productReadRepository)
+        public ProductController(IMediator mediator, IProductRepository productReadRepository)
         {
             _mediator = mediator;
             _productReadRepository = productReadRepository;
@@ -37,24 +37,29 @@ namespace Investments.Controllers
             return Ok(response);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] string? productName, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetAll([FromQuery] string? productName, [FromQuery] Guid? productId, CancellationToken cancellationToken = default)
         {
-            if(productName == null)
+            if(productName == null && productId == null)
             {
                 var response = await _mediator.Send(new GetAllProductQuery(), cancellationToken);
                 return Ok(response);
 
-            } else
+            } else if (productId != null)
             {
-                var response = await _mediator.Send(new GetProductByNameQuery(productName), cancellationToken);
+                var response = await _mediator.Send(new GetProductByQuery(productName), cancellationToken);
+                return Ok(response);
+            }
+            else
+            {
+                var response = await _mediator.Send(new GetProductByQuery(productId??Guid.Empty), cancellationToken);
                 return Ok(response);
             }
 
         }
         [HttpGet("statement")]
-        public async Task<IActionResult> GetStatementByName([FromQuery] string? user, [FromQuery] string? productName, [FromQuery] DateTime? expirationDate, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetStatementByName([FromQuery] ulong? userId, [FromQuery] string? productName, [FromQuery] DateTime? expirationDate, [FromQuery] Guid? productId, CancellationToken cancellationToken = default)
         {
-            var response = await _mediator.Send(new GetStatementByProductQuery(user, productName, expirationDate), cancellationToken);
+            var response = await _mediator.Send(new GetStatementByProductQuery(productName, userId, expirationDate, productId), cancellationToken);
 
             return Ok(response);
         }

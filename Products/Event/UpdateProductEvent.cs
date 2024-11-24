@@ -24,5 +24,13 @@ namespace Products.Event
             ProductType = product.ProductType;
             ExpirationDate = product.ExpirationDate;
         }
+        public UpdateProductEvent(Guid productId, decimal availableQuantity, string operationType, ulong userId)
+        {
+            Id = productId;
+            AvailableQuantity = availableQuantity;
+            OperationType = operationType;
+            UserId = userId;
+        }
+        public string OperationType { get; set; }
     }
 }

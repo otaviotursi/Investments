@@ -40,7 +40,7 @@ namespace Investments.Controllers
 
             } else
             {
-                var response = await _mediator.Send(new GetByCustomerCommand(id, fullName, user), cancellationToken);
+                var response = await _mediator.Send(new GetByCustomerQuery(id, fullName, user), cancellationToken);
                 return Ok(response);
             }
 

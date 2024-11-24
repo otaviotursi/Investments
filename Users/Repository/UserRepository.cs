@@ -83,9 +83,9 @@ namespace Users.Repository
                 .Sort(Builders<UserDB>.Sort.Descending("id"))
                 .ToListAsync();
 
-            var lastId = documentWithMaxId.Last().Id;
+            var lastId = documentWithMaxId.LastOrDefault()?.Id ?? 0;
 
-            return lastId ?? 0;
+            return lastId;
         }
 
     }
