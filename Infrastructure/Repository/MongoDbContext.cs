@@ -21,8 +21,8 @@ namespace Investments.Infrastructure.Repository
         }
 
         // Definição das coleções (equivalente ao DbSet do Entity Framework)
-        public IMongoCollection<ProductDB> ProductsRead => _database.GetCollection<ProductDB>("ProductsRead");
-        public IMongoCollection<ProductDB> ProductsWrite => _database.GetCollection<ProductDB>("ProductsWrite");
+        public IMongoCollection<ProductDB> Products => _database.GetCollection<ProductDB>("Products");
+        public IMongoCollection<ProductDB> ProductsStatement => _database.GetCollection<ProductDB>("ProductsStatement");
 
     }
 }

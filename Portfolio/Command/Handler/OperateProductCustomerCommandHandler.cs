@@ -40,14 +40,14 @@ namespace Portfolio.Command.Handler
                     product.ValueNegotiated = command.AmountNegotiated * productByQuery.UnitPrice;
                     await _repository.InsertAsync(product, cancellationToken);
                     var availableQuantity = productByQuery.AvailableQuantity - command.AmountNegotiated;
-                    await _mediator.Publish(new UpdateProductEvent(command.ProductId, availableQuantity, command.OperationType, 0), cancellationToken);
+                    await _mediator.Publish(new UpdateProductEvent(command.ProductId, availableQuantity, command.OperationType, productByQuery.UnitPrice, 0, productByQuery.ProductType, productByQuery.Name), cancellationToken);
 
                 }
                 else if (string.Equals(command.OperationType, "sell", StringComparison.OrdinalIgnoreCase))
                 {
                     var availableQuantity = productByQuery.AvailableQuantity + command.AmountNegotiated;
                     await _repository.RemoveAsync(product, cancellationToken);
-                    await _mediator.Publish(new UpdateProductEvent(command.ProductId, availableQuantity, command.OperationType, 0), cancellationToken);
+                    await _mediator.Publish(new UpdateProductEvent(command.ProductId, availableQuantity, command.OperationType, productByQuery.UnitPrice, 0, productByQuery.ProductType, productByQuery.Name), cancellationToken);
                 }
 
                 //chama evento de statement portfolio

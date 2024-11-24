@@ -26,8 +26,6 @@ namespace Products.Command.Handler
         {
             try
             {
-                var product = _mapper.Map<ProductDB>(command);
-
 
                 var productEvent = _mapper.Map<UpdateProductEvent>(command);
                 await _mediator.Publish(productEvent);

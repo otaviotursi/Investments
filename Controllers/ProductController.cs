@@ -46,12 +46,12 @@ namespace Investments.Controllers
 
             } else if (productId != null)
             {
-                var response = await _mediator.Send(new GetProductByQuery(productName), cancellationToken);
+                var response = await _mediator.Send(new GetProductByQuery(productId??Guid.Empty), cancellationToken);
                 return Ok(response);
             }
             else
             {
-                var response = await _mediator.Send(new GetProductByQuery(productId??Guid.Empty), cancellationToken);
+                var response = await _mediator.Send(new GetProductByQuery(productName), cancellationToken);
                 return Ok(response);
             }
 

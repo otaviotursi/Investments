@@ -85,6 +85,7 @@ namespace Products.Repository
                           !document["Data"]["Name"].IsBsonNull
                             ? document["Data"]["Name"].AsString
                             : string.Empty,
+                    UserId = Convert.ToUInt64(document["Data"]["UserId"]),
                     UnitPrice = Convert.ToDecimal(document["Data"]["UnitPrice"].AsString),
                     ExpirationDate = document["Data"]["ExpirationDate"].ToUniversalTime(),
                     ProductType = document.Contains("Data") &&
@@ -93,7 +94,12 @@ namespace Products.Repository
                           !document["Data"]["ProductType"].IsBsonNull
                             ? document["Data"]["ProductType"].AsString
                             : string.Empty,
-                    
+                    Type = document.Contains("Data") &&
+                          document["Data"].IsBsonDocument &&
+                          document["Data"].AsBsonDocument.Contains("Type") &&
+                          !document["Data"]["Type"].IsBsonNull
+                            ? document["Data"]["Type"].AsString
+                            : string.Empty,
                     AvailableQuantity = Convert.ToInt32(document["Data"]["AvailableQuantity"].AsString)
                 };
 
